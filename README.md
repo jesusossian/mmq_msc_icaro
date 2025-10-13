@@ -9,3 +9,5 @@ https://www.deeplearningbook.com.br/construindo-uma-rede-neural-com-linguagem-py
 
 Gurobi ML
 https://gurobi-machinelearning.readthedocs.io/en/stable/user/start.html
+
+https://gurobi-ai-modeling.readthedocs.io/en/latest/#
