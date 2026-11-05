@@ -1,0 +1,368 @@
+\chapter{Problema}
+\label{cap:problema}
+
+A otimização da produção de petróleo em poços é uma tarefa crítica de engenharia, cuja eficiência está diretamente ligada à acurácia da previsão da Vazão Diária de Petróleo ($\hat{y}$) em função das variáveis operacionais e de reservatório ($X$). As complexas interações entre estas variáveis frequentemente dificultam a obtenção de estimativas precisas por métodos tradicionais, que falham em mapear a função $f(X)$ de forma satisfatória. Tais iterações entre as variáveis, pode classificar o problema quanto à sua linearidade, se este será \textbf{linear} ou \textbf{não-linear}, e dada a grande quantidade de variáveis, é muito difícil classificar o problema apenas com a observação dos dados. Sendo assim, o problema abordado será modelado de ambas as formas e serão utilizadas as métricas dos modelos de \gls{ML}, apresentados no Capítulo \ref{cap:experimentos}, para determinar a natureza do problema, levando em consideração que foram utilizados modelos diferentes, onde alguns assumem o problema como linear e outros como não-linear, o que será melhor detalhado no Capítulo \ref{cap:proposta-e-metodologia}.
+
+Abaixo será apresentada a formulação matemática do problema, bem como os 2 tipos de modelagem do problema de acordo com as naturezas dos algoritmos, e por fim do problema de otimização das métricas.
+
+\section{Formulação do Problema}
+\label{subsec:formulacao}
+
+Com o entendimento do problema e de suas variáveis, foi possível desenvolver uma possível formulação matemática, de modo a tornar possível a utilização de algoritmos de otimização, e encontrar a solução ótima. Abaixo está a modelagem desenvolvida:
+
+\begin{align}
+    \max_{\mathbf{X}} & \quad \hat{y} = f(\mathbf{X}) \label{general_fo} \\
+    \text{s.a.} & \quad L_{\min, j} \le x_j \le L_{\max, j}, \quad \forall j \in \{1, 2, \dots, p\} \label{general_eq1} \\
+    & \quad x_{\text{Grau\_API}} = C_{\text{API}} \label{general_eq2} \\
+    & \quad x_{\text{Idade}} = C_{\text{Idade}} \label{general_eq3} \\
+    & \quad x_{\text{PCS}} = C_{\text{PCS}} \label{general_eq4} \\
+    & \quad x_{\text{Densidade GLP Gás}} = C_{\text{Densidade GLP Gás}} \label{general_eq5} \\
+    & \quad x_{\text{Densidade GLP Líquido}} = C_{\text{Densidade GLP Líquido}} \label{general_eq6} \\
+    & \quad x_{\text{Lâmina D'Água}} = C_{\text{Lâmina D'Água}} \label{general_eq7} \\
+    & \quad x_{\text{Distância Poço k}} = C_{\text{Distância Poço k}} \label{general_eq8} \\
+    & \quad x_{\text{Poços no Raio de 2 km}} = C_{\text{Poços no Raio de 2 km}} \label{general_eq9} \\
+    & \quad x_j \in \mathbb{R}_{+}, \quad \forall j \in \{1, 2, \dots, p\} \label{general_eq10}
+\end{align}
+
+Nesta modelagem, foi definida na equação (\ref{general_fo}) a função objetivo, que estabelece a meta de maximizar a produção estimada $\hat{y}$. A função $f(\mathbf{X})$ consiste na relação preditiva aprendida pelos algoritmos de \gls{ML}, como \textit{Linear Regression Forest} ou \textit{LightGBM}, capaz de capturar interações entre as variáveis, sejam essas lineares ou não lineares. A definição da função objetivo apresentada veio com base no escopo desse trabalho, que busca utilizar tais modelos para encontrar aquele que melhor se adapte aos dados apresentados.
+
+As variáveis deste modelo são representadas pelo vetor $\mathbf{X}=\{x_1, x_2, \dots, x_p\}$, composto pelos parâmetros operacionais que podem ser manipulados para influenciar a vazão. O domínio definido para essas variáveis na equação (\ref{general_eq10}) como reais não negativos ($\mathbb{R}_{+}$) reflete a natureza física de grandezas como vazões e intervalos temporais.
+
+A equação \ref{general_eq1} determina o intervalo das variáveis de decisão $x_j \in \mathbf{X}$. 
+Tais variáveis devem respeitar os limites mínimos ($L_{\min}$) e máximos ($L_{\max}$) de segurança e capacidade dos equipamentos.
+
+Por fim, as equações (\ref{general_eq2})-(\ref{general_eq9}) determinam os parâmetros do problema, de modo que tais informações são relacionadas à um poço específico, e não podem ser alteradas.
+
+\section{Problema Linear}
+
+Os modelos lineares supervisionados assumem uma relação funcional paramétrica e aditiva entre uma matriz de atributos preditores e uma variável resposta contínua. O objetivo consiste em estimar o vetor de coeficientes $\boldsymbol{\beta} \in \mathbb{R}^{p+1}$ que minimiza a soma dos \gls{RSS}, acrescida ou não de um termo de regularização para conter a variância das estimativas. A formulação geral de otimização irrestrita para essa classe de regressores é expressa por:
+
+\begin{align}
+\min_{\boldsymbol{\beta} \in \mathbb{R}^{p+1}} \quad J(\boldsymbol{\beta}) = \sum_{i=1}^{n} \left(y_i - \left(\beta_0 + \sum_{j=1}^{p} \beta_j x_{ij}\right)\right)^2 + \lambda \cdot R(\boldsymbol{\beta}) \label{eq:fo_linear_geral}
+\end{align}
+
+\noindent em que $y_i \in \mathbb{R}$ representa o valor escalar observado da variável resposta para a $i$-ésima instância ($i = 1, \dots, n$), e $x_{ij} \in \mathbb{R}$ denota o valor associado ao $j$-ésimo atributo preditivo ($j = 1, \dots, p$). O vetor de parâmetros a ser estimado decompõe-se no termo independente ou intercepto ($\beta_0 \in \mathbb{R}$) e nos pesos lineares associados a cada dimensão ($\beta_j \in \mathbb{R}$). O parâmetro $\lambda \ge 0$ atua como o hiperparâmetro de regularização, ditando a intensidade da penalidade sobre a magnitude dos coeficientes.
+
+A partir da estrutura apresentada na equação \ref{eq:fo_linear_geral}, derivam-se três variantes fundamentais de regressão linear em função da definição adotada para o funcional $R(\boldsymbol{\beta})$:
+
+\begin{itemize}
+    \item \textbf{Regressão Linear por \gls{OLS}:} Obtida definindo $\lambda = 0$. Sob essa condição, o ajuste depende estritamente da minimização dos desvios quadráticos amostrais. Trata-se de um estimador não tendencioso de variância mínima sob as hipóteses do Teorema de Gauss-Markov, porém suscetível à instabilidade numérica e sobreajuste na presença de multicolinearidade.
+    
+    \item \textbf{Regressão Ridge (Regularização $L\_2$):} Configura-se aplicando a norma euclidiana quadrática dos pesos preditores, isto é, $R(\boldsymbol{\beta}) = \Vert{}\boldsymbol{\beta}_{1:p}\Vert{}_2^2 = \sum_{j=1}^{p} \beta_j^2$. A penalização quadrática contrai uniformemente os coeficientes em direção a zero, mitigando a variância do estimador frente a variáveis altamente correlacionadas, embora não realize a seleção esparsa de variáveis ($\beta_j \neq 0, \forall j$).
+
+    \item \textbf{Regressão Lasso (Regularização $L\_1$):} Estrutura-se a partir da penalização pela norma de Manhattan, definida por $R(\boldsymbol{\beta}) = \Vert{}\boldsymbol{\beta}_{1:p}\Vert{}_1 = \sum_{j=1}^{p} \vert{}\beta_j\vert{}$. Devido à geometria dos contornos da norma $L_1$, que contém vértices nos eixos das coordenadas, essa formulação força coeficientes de variáveis irrelevantes ou redundantes a assumirem exatamente o valor zero para valores adequados de $\lambda$, atuando concomitantemente como estimador preditivo e mecanismo de seleção de atributos (\textit{feature selection}).
+\end{itemize}
+
+Ressalta-se que o termo independente $\beta_0$ é comumente excluído da função de penalidade $R(\boldsymbol{\beta})$, assegurando que a penalização incida exclusivamente sobre as inclinações relativas às variáveis explicativas e preserve o ajuste médio da distribuição amostral.
+
+\section{Problema Não Linear}
+
+A fim de superar a rigidez funcional das abordagens lineares e modelar interações mais complexas entre os atributos, é necessário recorrer a modelos de aprendizado supervisionado não linear. De forma geral, esses algoritmos assumem que a variável contínua observada $y_i \in \mathbb{R}$ relaciona-se com o vetor de atributos preditores $\mathbf{x}_i \in \mathbb{R}^p$ por meio de uma função arbitrária $f: \mathbb{R}^p \to \mathbb{R}$ sujeita a ruído estocástico:
+
+\begin{align}
+y_i = f(\mathbf{x}_i) + \varepsilon_i, \quad \text{com } \mathbb{E}[\varepsilon_i \mid \mathbf{x}_i] = 0 \text{ e } \operatorname{Var}(\varepsilon_i \mid \mathbf{x}_i) = \sigma^2 \label{eq:regressao_nao_linear_geral}
+\end{align}
+
+Em vez de restringir a busca a um hiperplano paramétrico estrito, o objetivo consiste em aproximar a função desconhecida $f(\cdot)$ dentro de um espaço de hipóteses $\mathcal{F}$, minimizando o risco empírico regularizado:
+
+\begin{align}
+\min_{f \in \mathcal{F}} \quad \frac{1}{n} \sum_{i=1}^{n} \mathcal{L}(y_i, f(\mathbf{x}_i)) + \Omega(f) \label{eq:otimizacao_nao_linear}
+\end{align}
+
+\noindent em que $L(\cdot)$ representa a função de perda (como o erro quadrático ou a perda insensível) e $\Omega(f)$ impõe uma penalidade sobre a complexidade funcional para mitigar o sobreajuste.
+
+Nesta pesquisa, foram avaliados cinco modelos não lineares, distribuídos em três famílias metodológicas de \gls{ML}: algoritmos baseados em instâncias e vizinhança, algoritmos baseados em \gls{SVM}, e algoritmos baseados em árvores de decisão.
+
+\subsection{Modelos baseados em Instâncias e Vizinhança}
+
+A família de modelos baseados em instâncias e vizinhança fundamenta-se no princípio do aprendizado preguiçoso (\textit{lazy learning}), no qual não há uma fase de calibração de parâmetros globais ou estimação prévia de hiperplanos. O algoritmo investigado nesta categoria foi o \gls{KNN}, amplamente consolidado em problemas de classificação e adaptado para a regressão contínua \cite{ibm_knn}.
+
+Dada uma nova observação $\mathbf{x}^* \in \mathbb{R}^p$, o modelo estima a variável de resposta contínua calculando a média aritmética dos valores observados entre os $k$ vizinhos mais próximos no espaço vetorial de atributos:
+
+\begin{equation}
+\hat{f}_{\text{KNN}}(\mathbf{x}^*) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(\mathbf{x}^*)} y_i \label{eq:predicao_knn}
+\end{equation}
+
+\noindent em que $\mathcal{N}_k(\mathbf{x}^*)$ denota o conjunto de índices das $k$ instâncias amostrais com menor distância em relação a $\mathbf{x}^*$. A proximidade métrica entre as instâncias no espaço $\mathbb{R}^p$ pode ser generalizada pela distância de Minkowski com parâmetro $q \ge 1$:
+
+\begin{equation}
+d_q(\mathbf{x}^*, \mathbf{x}_i) = \left( \sum_{j=1}^{p} |x^*_j - x_{ij}|^q \right)^{\frac{1}{q}} \label{eq:distancia_minkowski}
+\end{equation}
+
+A partir da formulação geral em (\ref{eq:distancia_minkowski}), derivam-se métricas específicas em função do valor atribuído a $q$:
+\begin{itemize}
+    \item \textbf{Distância Manhattan ($q = 1$):} baseada na norma $\ell_1$, soma as diferenças absolutas em cada dimensão:
+    \begin{equation}
+    d_{\text{Manhattan}}(\mathbf{x}^*, \mathbf{x}_i) = \sum_{j=1}^{p} |x^*_j - x_{ij}| \label{eq:distancia_manhattan}
+    \end{equation}
+    
+    \item \textbf{Distância Euclidiana ($q = 2$):} correspondente à norma euclidiana padrão $\ell_2$, adotada como configuração padrão neste trabalho:
+    \begin{equation}
+    d_{\text{Euclidiana}}(\mathbf{x}^*, \mathbf{x}_i) = \sqrt{\sum_{j=1}^{p} (x^*_j - x_{ij})^2} \label{eq:distancia_euclidiana}
+    \end{equation}
+\end{itemize}
+
+A não linearidade do estimador manifesta-se pela partição local do domínio contínuo em células de Voronoi implícitas, permitindo que a resposta se adapte a superfícies de produção complexas sem hipóteses restritivas sobre a distribuição dos dados. Ressalta-se que, devido à sensibilidade intrínseca das métricas de distância em (\ref{eq:distancia_minkowski}) à magnitude dos atributos preditores, a padronização das variáveis via \texttt{StandardScaler} no \texttt{Pipeline} foi estritamente indispensável para assegurar pesos homogêneos a todas as dimensões durante a busca dos vizinhos mais próximos.
+
+\subsection{Algoritmos baseados em \gls{SVM}}
+
+O grupo de algoritmos baseados em \gls{SVM} busca assegurar alta capacidade de generalização a partir de um número limitado de padrões de treinamento, fundamentando-se no princípio da \gls{SRM}. Tal princípio atua equilibrando simultaneamente a minimização do risco empírico e o controle da dimensão \gls{VC}, a qual expressa a capacidade de representação do modelo por meio do tamanho máximo de um conjunto de dados passível de ser perfeitamente separado (ou rotulado) pela família de funções admitida \cite{basak_svr}. 
+
+O conceito de \gls{SVM} foi formalizado por \citeonline{vapnik1995nature}, estabelecendo que o estimador projeta o vetor de atributos de entrada $\mathbf{x}$ em um espaço de características de alta dimensionalidade $\mathcal{F}$ por meio de um mapeamento não linear a priori, ambiente no qual se constrói um hiperplano ótimo de separação que maximiza a margem geométrica entre os padrões.
+
+No trabalho em questão, utilizou-se o algoritmo \gls{SVR}, que estende a formulação original de classificação para a predição de variáveis contínuas, adotando-se especificamente a sua formulação não linear. Dada uma base de treinamento com $l$ instâncias $\{(\mathbf{x}_1, y_1), \dots, (\mathbf{x}_l, y_l)\}$, onde $\mathbf{x}_i \in \mathbb{R}^p$ e $y_i \in \mathbb{R}$, o objetivo consiste em determinar uma função linear no espaço transformado, $f(\mathbf{x}) = \langle \boldsymbol{\omega}, \Phi(\mathbf{x}) \rangle + b$, que apresente desvio máximo de $\varepsilon$ em relação aos alvos observados $y_i$ e mantenha a máxima regularidade possível (minimizando $\|\boldsymbol{\omega}\|^2$), em que $\langle \cdot, \cdot \rangle_{\mathcal{F}}$ denota o produto escalar no espaço de características $\mathcal{F}$. Para tanto, adota-se a função de perda $\varepsilon$-insensível de Vapnik:
+
+\begin{equation}
+    |\xi|_\varepsilon = 
+    \begin{cases}
+        0, & \text{se } |\xi| < \varepsilon \\
+        |\xi| - \varepsilon, & \text{caso contrário}
+    \end{cases} 
+    \label{eq:perda_epsilon}
+\end{equation}
+
+\noindent em que desvios contidos no intervalo $[-\varepsilon, +\varepsilon]$ não recebem penalização, conferindo imunidade a variações estocásticas nas séries temporais de vazão \cite{basak_svr}.
+
+Para acomodar desvios que eventualmente ultrapassem os limites de tolerância do tubo, introduzem-se variáveis de folga $\xi_i$ e $\xi_i^*$ para erros positivos e negativos, formulando o problema de otimização primal convexo:
+
+\begin{align}
+    \min_{\boldsymbol{\omega}, b, \boldsymbol{\xi}, \boldsymbol{\xi}^*} & \quad \frac{1}{2}\|\boldsymbol{\omega}\|^2 + C \sum_{i=1}^{l} (\xi_i + \xi_i^*) \label{eq:primal_svr}\\
+    \text{s.a.} & \quad y_i - \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle - b \le \varepsilon + \xi_i, \quad \forall i \in \{1, \dots, l\} \label{eq:restr_primal1} \\
+    & \quad \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle + b - y_i \le \varepsilon + \xi_i^*, \quad \forall i \in \{1, \dots, l\} \label{eq:restr_primal2} \\
+    & \quad \xi_i, \xi_i^* \ge 0, \quad \forall i \in \{1, \dots, l\} \label{eq:restr_primal3}
+\end{align}
+
+\noindent onde a constante de regularização $C > 0$ estabelece o \textit{trade-off} entre a regularidade de $f$ e a tolerância aos desvios marginais.
+
+A função de mapeamento não linear $\Phi: \mathbb{R}^p \to \mathcal{F}$ desempenha o papel central de projetar os vetores de atributos originais do espaço de entrada para um espaço de características de dimensão potencialmente infinita $\mathcal{F}$. A fundamentação teórica dessa transformação repousa no fato de que relações complexas e intrinsecamente não lineares no espaço original tornam-se passíveis de ajuste linear quando representadas nessa dimensionalidade superior \cite{muller2001introduction}. Contudo, a avaliação explícita das coordenadas de $\Phi(\mathbf{x})$ é frequentemente inviável do ponto de vista analítico e computacional. Essa barreira é contornada pelo artifício do núcleo, no qual o produto interno $\langle \Phi(\mathbf{x}_i), \Phi(\mathbf{x}_j) \rangle_{\mathcal{F}}$ é calculado de maneira estritamente implícita no espaço original por meio da função de núcleo $k(\mathbf{x}_i, \mathbf{x}_j)$, dispensando o conhecimento direto da forma funcional exata de $\Phi(\cdot)$.
+
+A resolução eficiente em alta dimensão fundamenta-se na formulação dual de Lagrange. Introduzindo os multiplicadores $\alpha_i, \alpha_i^* \ge 0$ (associados ao tubo de tolerância) e $\eta_i, \eta_i^* \ge 0$ (associados às folgas $\xi_i, \xi_i^*$), a função Lagrangiana $L$ expressa-se por:
+
+\begin{align}
+    L = & \quad \frac{1}{2}\|\boldsymbol{\omega}\|^2 + C\sum_{i=1}^{l}(\xi_i + \xi_i^*) - \sum_{i=1}^{l}\alpha_i(\varepsilon + \xi_i - y_i + \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle + b) \nonumber \\
+    & - \sum_{i=1}^{l}\alpha_i^*(\varepsilon + \xi_i^* + y_i - \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle - b) - \sum_{i=1}^{l}(\eta_i\xi_i + \eta_i^*\xi_i^*) \label{eq:lagrangiano_svr}
+\end{align}
+
+Pelas condições de ponto de sela para otimalidade, a anulação das derivadas parciais de $L$ em relação às variáveis primais $(\boldsymbol{\omega}, b, \xi_i, \xi_i^*)$ resulta em:
+
+\begin{align}
+    \frac{\partial L}{\partial b} = \sum_{i=1}^{l}(\alpha_i^* - \alpha_i) = 0 \label{eq:kkt_deriv_b} \\
+    \frac{\partial L}{\partial \boldsymbol{\omega}} = \boldsymbol{\omega} - \sum_{i=1}^{l}(\alpha_i - \alpha_i^*)\Phi(\mathbf{x}_i) = 0 \quad \Longrightarrow \quad \boldsymbol{\omega} = \sum_{i=1}^{l}(\alpha_i - \alpha_i^*)\Phi(\mathbf{x}_i) \label{eq:vetor_omega} \\
+    \frac{\partial L}{\partial \xi_i^{(*)}} = C - \alpha_i^{(*)} - \eta_i^{(*)} = 0 \label{eq:kkt_deriv_xi}
+\end{align}
+
+Substituindo (\ref{eq:kkt_deriv_b}), (\ref{eq:vetor_omega}) e (\ref{eq:kkt_deriv_xi}) na Equação (\ref{eq:lagrangiano_svr}), obtém-se o problema quadrático dual:
+
+\begin{align}
+    \max_{\boldsymbol{\alpha}, \boldsymbol{\alpha}^*} & \quad -\frac{1}{2}\sum_{i=1}^{l}\sum_{j=1}^{l}(\alpha_i - \alpha_i^*)(\alpha_j - \alpha_j^*) k(\mathbf{x}_i, \mathbf{x}_j) - \varepsilon\sum_{i=1}^{l}(\alpha_i + \alpha_i^*) + \sum_{i=1}^{l}y_i(\alpha_i - \alpha_i^*) \label{eq:dual_svr} \\
+    \text{s.a.} & \quad \sum_{i=1}^{l}(\alpha_i - \alpha_i^*) = 0 \label{eq:restr_dual1} \\
+    & \quad 0 \le \alpha_i, \alpha_i^* \le C, \quad \forall i \in \{1, \dots, l\} \label{eq:restr_dual2}
+\end{align}
+
+A função de predição final resulta da expansão por vetores de suporte expressa em (\ref{eq:vetor_omega}):
+
+\begin{equation}
+    \hat{f}_{\text{SVR}}(\mathbf{x}^*) = \sum_{i=1}^{l} (\alpha_i - \alpha_i^*) k(\mathbf{x}_i, \mathbf{x}^*) + b \label{eq:predicao_final_svr}
+\end{equation}
+
+Pelas condições de folga complementar de \gls{KKT}, os produtos entre variáveis duais e restrições primais anulam-se no ponto ótimo:
+
+\begin{align}
+    \alpha_i(\varepsilon + \xi_i - y_i + \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle + b) &= 0 \label{eq:kkt_cond1} \\
+    \alpha_i^*(\varepsilon + \xi_i^* + y_i - \langle \boldsymbol{\omega}, \Phi(\mathbf{x}_i) \rangle - b) &= 0 \label{eq:kkt_cond2} \\
+    (C - \alpha_i)\xi_i = 0 \quad \text{e} \quad (C - \alpha_i^*)\xi_i^* &= 0 \label{eq:kkt_cond3}
+\end{align}
+
+Dentre as propriedades analíticas destacadas por \citeonline{basak_svr}, sobressaem-se:
+\begin{enumerate}
+    \item \textbf{Esparsidade (\textit{Sparsity}):} para amostras contidas no interior do tubo ($|f(\mathbf{x}_i) - y_i| < \varepsilon$), tem-se $\xi_i = \xi_i^* = 0$, implicando necessariamente $\alpha_i = \alpha_i^* = 0$. Apenas observações com resíduo igual ou superior a $\varepsilon$ apresentam coeficientes não nulos, sendo denominadas \textit{vetores de suporte};
+    \item \textbf{Exclusão mútua:} como uma observação não pode violar simultaneamente as duas margens, decorre que $\alpha_i \cdot \alpha_i^* = 0$;
+    \item \textbf{Cálculo do termo de viés ($b$):} para vetores de suporte situados estritamente na margem livre ($0 < \alpha_i^{(*)} < C$), tem-se $\xi_i^{(*)} = 0$, permitindo isolar $b$ a partir de (\ref{eq:kkt_cond1}) e (\ref{eq:kkt_cond2}):
+    \begin{equation}
+    b = 
+    \begin{cases}
+    y_i - \sum_{j=1}^{l}(\alpha_j - \alpha_j^*) k(\mathbf{x}_j, \mathbf{x}_i) - \varepsilon, & \text{para } \alpha_i \in (0, C) \\
+    y_i - \sum_{j=1}^{l}(\alpha_j - \alpha_j^*) k(\mathbf{x}_j, \mathbf{x}_i) + \varepsilon, & \text{para } \alpha_i^* \in (0, C)
+    \end{cases} \label{eq:calculo_bias}
+    \end{equation}
+\end{enumerate}
+
+A escolha da função de núcleo (\textit{kernel}) $k(\mathbf{x}_i, \mathbf{x}_j)$ determina a geometria do mapeamento implícito e a classe funcional do estimador. No presente trabalho, o espaço de busca hiperparamétrica avaliou quatro formulações mercerianas clássicas:
+
+\begin{enumerate}
+    \item \textbf{Linear:}
+    \begin{equation}
+        k(\mathbf{x}_i, \mathbf{x}_j) = \langle \mathbf{x}_i, \mathbf{x}_j \rangle \label{eq:kernel_linear}
+    \end{equation}
+    
+    \item \textbf{\gls{RBF}:}
+    \begin{equation}
+        k(\mathbf{x}_i, \mathbf{x}_j) = \exp\left(-\gamma \|\mathbf{x}_i - \mathbf{x}_j\|_2^2\right), \quad \gamma > 0 \label{eq:kernel_rbf}
+    \end{equation}
+    
+    \item \textbf{Polinomial:}
+    \begin{equation}
+        k(\mathbf{x}_i, \mathbf{x}_j) = \left(\gamma \langle \mathbf{x}_i, \mathbf{x}_j \rangle + r\right)^d, \quad \gamma > 0, \; d \in \mathbb{N}^* \label{eq:kernel_poly}
+    \end{equation}
+    
+    \item \textbf{Sigmoide:}
+    \begin{equation}
+        k(\mathbf{x}_i, \mathbf{x}_j) = \tanh\left(\gamma \langle \mathbf{x}_i, \mathbf{x}_j \rangle + r\right) \label{eq:kernel_sigmoid}
+    \end{equation}
+\end{enumerate}
+
+\noindent em que $\gamma$ governa a largura da influência local ou escala das projeções, $r$ denota o termo independente de deslocamento e $d$ representa o grau polinomial. Todos os hiperparâmetros estruturais ($C$ e $\varepsilon$), bem como os parâmetros intrínsecos de cada família de núcleos ($\gamma$, $r$ e $d$), foram sistematicamente calibrados por validação cruzada por meio de \texttt{GridSearchCV}. 
+
+Ademais, em virtude da sensibilidade às magnitudes relativas dos preditores — evidenciada tanto pela norma euclidiana presente em (\ref{eq:kernel_rbf}) quanto pelos produtos escalares sucessivos em (\ref{eq:kernel_linear}), (\ref{eq:kernel_poly}) e (\ref{eq:kernel_sigmoid}) —, a padronização das covariáveis via \texttt{StandardScaler} no fluxo do \texttt{Pipeline} foi mantida estritamente para todos os núcleos avaliados, assegurando estabilidade numérica e homogeneidade dimensional durante a otimização quadrática.
+
+\subsection{Algoritmos baseados em Árvores de Decisão}
+
+As árvores de decisão para regressão fundamentam-se no particionamento binário recursivo e hierárquico do espaço de atributos em sub-regiões ortogonais disjuntas, associando a cada nó terminal (folha) um valor constante determinado pela média amostral local das respostas. Conforme revisado historicamente por \citeonline{loh2014fifty}, a metodologia consolidou-se a partir de pioneiros como o \gls{AID} e, posteriormente, o \gls{CART}, nos quais a escolha da melhor divisão em cada nó decorre da busca exaustiva pelo atributo e ponto de corte que maximizem a redução da soma dos quadrados dos resíduos locais. Não obstante a sua elevada interpretabilidade estrutural e capacidade intrínseca de lidar com não linearidades, estimadores baseados em árvores individuais apresentam alta variância amostral e instabilidade numérica frente a pequenas perturbações nos dados de treinamento, fatores que impulsionaram historicamente a sua consolidação como estimadores-base em arquiteturas de comitês (\textit{ensembles}).
+
+No escopo deste trabalho, foram avaliados os seguintes algoritmos baseados em árvores: Random Forest, Gradient Boosting.
+
+\subsubsection{Random Forest}
+
+O algoritmo \textit{Random Forest} fundamenta-se na extensão do paradigma de \textit{bagging} aplicado a árvores de decisão, tendo sido formalizado originalmente por \citeonline{Breiman_2001_RandomForests}. O modelo opera construindo uma coleção de estimadores $\{h(\mathbf{x}, \Theta_k), k = 1, \dots, K\}$, denominados árvores de decisão, em que cada unidade é ajustada sobre uma partição de dados gerada por reamostragem com reposição (\textit{bootstrap}) e os vetores aleatórios $\Theta_k$ determinam a amostragem independente de um subconjunto restrito de atributos em cada divisão de nó.
+
+Considerando um problema de regressão em que as respostas observadas $Y \in \mathbb{R}$ são variáveis contínuas associadas a atributos $\mathbf{X} \in \mathbb{R}^p$, com amostra de treinamento $\mathcal{D}_n = \{(\mathbf{X}_1, Y_1), \dots, (\mathbf{X}_n, Y_n)\}$ sorteada independentemente a partir da distribuição conjunta $(\mathbf{X}, Y)$, o erro quadrático médio de generalização para qualquer estimador $h(\mathbf{X})$ é definido formalmente por:
+
+\begin{equation}
+    \text{PE}^*(h) = \mathbb{E}_{\mathbf{X}, Y}\left[\left(Y - h(\mathbf{X})\right)^2\right] \label{eq:erro_generalizacao_rf}
+\end{equation}
+
+\noindent No contexto computacional finito, a predição da floresta corresponde à média aritmética simples das predições pontuais emitidas pelas $K$ árvores individuais:
+
+\begin{equation}
+    \bar{h}(\mathbf{x}) = \frac{1}{K} \sum_{k=1}^{K} h(\mathbf{x}, \Theta_k) \label{eq:predicao_rf_breiman}
+\end{equation}
+
+Embora a representação de \citeonline{Breiman_2001_RandomForests} espelhe diretamente a rotina algorítmica executada na prática, a análise assintótica de suas propriedades estatísticas demanda uma formulação analítica fechada. Com esse propósito, \citeonline{biau2012analysis} formalizou cada árvore individual como um estimador de partição linear local sobre o suporte amostral $[0, 1]^p$. Seja $A_n(\mathbf{X}; \Theta)$ a célula hiper-retangular única (folha terminal) que contém o ponto de consulta $\mathbf{X}$, a estimativa da árvore expressa-se por \cite{biau2012analysis}:
+
+\begin{equation}
+    m_n(\mathbf{X}; \Theta) = \frac{\sum_{i=1}^{n} Y_i \mathbb{I}_{\{\mathbf{X}_i \in A_n(\mathbf{X}; \Theta)\}}}{N_n(\mathbf{X}; \Theta)} \mathbb{I}_{\mathcal{E}_n(\mathbf{X}; \Theta)} \label{eq:arvore_biau}
+\end{equation}
+
+\noindent em que $N_n(\mathbf{X}; \Theta) = \sum_{i=1}^{n} \mathbb{I}_{\{\mathbf{X}_i \in A_n(\mathbf{X}; \Theta)\}}$ contabiliza o número de instâncias de treinamento contidas na partição de $\mathbf{X}$, e o evento $\mathcal{E}_n(\mathbf{X}; \Theta) = \{N_n(\mathbf{X}; \Theta) \neq 0\}$ atribui predição nula caso a célula terminal não contenha observações amostrais.
+
+Definindo os pesos individuais $W_{n,i}(\mathbf{X}; \Theta) = \frac{\mathbb{I}_{\{\mathbf{X}_i \in A_n(\mathbf{X}; \Theta)\}}}{N_n(\mathbf{X}; \Theta)} \mathbb{I}_{\mathcal{E}_n(\mathbf{X}; \Theta)}$, a floresta agregada idealizada no limite assintótico ($K \to \infty$) resulta da esperança matemática condicional sobre a distribuição do parâmetro de aleatorização $\Theta$ \cite{biau2012analysis}:
+
+\begin{equation}
+    \bar{m}_n(\mathbf{X}) = \mathbb{E}_{\Theta}\left[m_n(\mathbf{X}; \Theta)\right] = \sum_{i=1}^{n} \mathbb{E}_{\Theta}\left[ W_{n,i}(\mathbf{X}; \Theta) \right] Y_i \label{eq:floresta_biau_pesos}
+\end{equation}
+
+A formulação (\ref{eq:floresta_biau_pesos}) evidencia que o \textit{Random Forest} opera como um estimador por ponderação local adaptativa, no qual o peso atribuído a cada observação $Y_i$ quantifica a probabilidade marginal de $\mathbf{X}_i$ compartilhar a mesma célula de particionamento com $\mathbf{X}$ ao longo do espaço induzido por $\Theta$. Ademais, \citeonline{biau2012analysis} demonstrou que esse mecanismo garante a consistência estatística do estimador e promove adaptação intrínseca à esparsidade: a taxa de convergência do erro quadrático médio depende estritamente do número de variáveis efetivamente informativas ($S \le p$), tornando o algoritmo robusto à presença de atributos ruidosos ou redundantes no espaço de entrada.
+
+\subsubsection{Gradient Boosting}
+
+Diferentemente do paradigma de \textit{bagging}, no qual os estimadores são construídos de maneira independente e paralela para reduzir a variância, o \textit{Gradient Boosting}, formalizado por \citeonline{friedman2001gradient}, fundamenta-se na aproximação de funções sob a perspectiva de otimização numérica no espaço funcional. Dada uma amostra de treinamento $\{\mathbf{x}_i, y_i\}_{i=1}^{N}$, o objetivo consiste em determinar uma função aproximadora $F^*(\mathbf{x})$ que minimize o valor esperado de uma função de perda diferenciável $\Psi(y, F(\mathbf{x}))$ sobre a distribuição conjunta de $(\mathbf{x}, y)$:
+
+\begin{equation}
+    F^*(\mathbf{x}) = \arg\min_{F(\mathbf{x})} \mathbb{E}_{y, \mathbf{x}}\left[\Psi(y, F(\mathbf{x}))\right] \label{eq:obj_friedman}
+\end{equation}
+
+Para tornar o problema tratável em amostras finitas, restringe-se $F(\mathbf{x})$ a uma expansão aditiva parametrizada de estimadores-base (\textit{weak learners}) $h(\mathbf{x}; \mathbf{a}_m)$, estruturados como árvores de decisão de tamanho reduzido:
+
+\begin{equation}
+    F(\mathbf{x}; \{\beta_m, \mathbf{a}_m\}_{m=0}^{M}) = \sum_{m=0}^{M} \beta_m h(\mathbf{x}; \mathbf{a}_m) \label{eq:expansao_aditiva_gb}
+\end{equation}
+
+\noindent em que $\mathbf{a}_m$ engloba os parâmetros estruturais de particionamento da $m$-ésima árvore (variáveis de divisão, pontos de corte e médias dos nós terminais) e $\beta_m$ denota o coeficiente de expansão.
+
+Partindo de uma estimativa inicial constante $F_0(\mathbf{x}) = \arg\min_{\rho} \sum_{i=1}^{N} \Psi(y_i, \rho)$, o algoritmo adota uma estratégia gulosa passo a passo análoga ao método de descida mais íngreme. Em cada iteração $m \in \{1, \dots, M\}$, calcula-se a direção do gradiente negativo não restrito da função de perda em relação ao modelo acumulado $F_{m-1}(\mathbf{x})$, originando as chamadas pseudo-respostas (ou pseudo-resíduos) $\tilde{y}_i$:
+
+\begin{equation}
+    \tilde{y}_i = -\left[\frac{\partial \Psi(y_i, F(\mathbf{x}_i))}{\partial F(\mathbf{x}_i)}\right]_{F(\mathbf{x}) = F_{m-1}(\mathbf{x})}, \quad \forall i \in \{1, \dots, N\} \label{eq:pseudo_residuos}
+\end{equation}
+
+No caso particular de regressão por mínimos quadrados ordinários, em que $\Psi(y, F) = \frac{1}{2}(y - F)^2$, a Equação (\ref{eq:pseudo_residuos}) reduz-se diretamente aos resíduos correntes do comitê, $\tilde{y}_i = y_i - F_{m-1}(\mathbf{x}_i)$. Em seguida, ajusta-se uma nova árvore de decisão $h(\mathbf{x}; \mathbf{a}_m)$ por mínimos quadrados para aproximar a direção dos pseudo-resíduos e determina-se o comprimento ótimo do passo $\rho_m$ via busca linear:
+
+\begin{align}
+    \mathbf{a}_m &= \arg\min_{\mathbf{a}, \beta} \sum_{i=1}^{N} \left[\tilde{y}_i - \beta h(\mathbf{x}_i; \mathbf{a})\right]^2 \label{eq:ajuste_arvore_gb} \\
+    \rho_m &= \arg\min_{\rho} \sum_{i=1}^{N} \Psi\left(y_i, F_{m-1}(\mathbf{x}_i) + \rho h(\mathbf{x}_i; \mathbf{a}_m)\right) \label{eq:line_search_gb}
+\end{align}
+
+Para mitigar o \textit{overfitting} decorrente da adição sucessiva de árvores, \citeonline{friedman2001gradient} introduz um mecanismo de regularização por encolhimento proporcional (\textit{shrinkage}), escalonando a contribuição de cada novo estimador por um parâmetro $0 < \nu \le 1$ (taxa de aprendizado), o que resulta na regra de atualização iterativa:
+
+\begin{equation}
+    F_m(\mathbf{x}) = F_{m-1}(\mathbf{x}) + \nu \rho_m h(\mathbf{x}; \mathbf{a}_m), \quad 0 < \nu \le 1 \label{eq:update_shrinkage_gb}
+\end{equation}
+
+\noindent estabelecendo um compromisso direto entre a magnitude de $\nu$ e o número total de iterações $M$ necessárias para a convergência do comitê.
+
+A partir do arcabouço clássico de \citeonline{friedman2001gradient}, implementações modernas como o XGBoost (\textit{eXtreme Gradient Boosting}) e o LightGBM (\textit{Light Gradient Boosting Machine}) introduziram aprimoramentos analíticos e computacionais voltados à regularização estrutural e à escalabilidade.
+
+Proposto por \citeonline{Chen_2016_XGBoost}, o XGBoost define o espaço de árvores de regressão \gls{CART} como $\mathcal{F} = \{f(\mathbf{x}) = w_{q(\mathbf{x})}\}$, em que a estrutura $q: \mathbb{R}^p \to \{1, \dots, T\}$ mapeia cada observação ao índice de seu respectivo nó terminal e $\mathbf{w} \in \mathbb{R}^T$ representa o vetor de pesos associados às $T$ folhas da árvore. O algoritmo distingue-se da formulação tradicional de primeira ordem pela incorporação de um termo de penalização explícito sobre a complexidade do modelo e pelo emprego de uma aproximação em série de Taylor de segunda ordem. Na $t$-ésima iteração, busca-se o estimador $f_t \in \mathcal{F}$ que minimiza o objetivo regularizado:
+
+\begin{equation}
+    \mathcal{L}^{(t)} = \sum_{i=1}^{N} l\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) + \Omega(f_t), \quad \text{com} \quad \Omega(f_t) = \gamma T + \frac{1}{2}\lambda \|\mathbf{w}\|^2 \label{eq:obj_xgboost}
+\end{equation}
+
+\noindent em que $l$ é uma função de perda convexa diferenciável que calcula a diferença entre o valor alvo $y_i$ e a predição $\hat{y}_i$, $\gamma$ penaliza a quantidade de folhas $T$ e $\lambda$ controla a regularização $L_2$ sobre a magnitude dos pesos terminais. Expandindo a função de perda em série de Taylor até a segunda ordem em torno de $\hat{y}^{(t-1)}$ e removendo os termos constantes, obtém-se o objetivo simplificado:
+
+\begin{equation}
+    \tilde{\mathcal{L}}^{(t)} = \sum_{i=1}^{N} \left[ g_i f_t(\mathbf{x}_i) + \frac{1}{2} h_i f_t^2(\mathbf{x}_i) \right] + \gamma T + \frac{1}{2}\lambda \|\mathbf{w}\|^2 \label{eq:taylor_xgboost}
+\end{equation}
+
+\noindent no qual $g_i = \partial_{\hat{y}^{(t-1)}} l(y_i, \hat{y}^{(t-1)})$ e $h_i = \partial^2_{\hat{y}^{(t-1)}} l(y_i, \hat{y}^{(t-1)})$ denotam as estatísticas de gradiente de primeira e segunda ordem, respectivamente. Definindo $I_j = \{i \mid q(\mathbf{x}_i) = j\}$ como o conjunto de instâncias alocadas na folha $j$, calcula-se analiticamente o peso ótimo $w_j^*$ e o escore de qualidade estrutural correspondente:
+
+\begin{equation}
+    w_j^* = -\frac{\sum_{i \in I_j} g_i}{\sum_{i \in I_j} h_i + \lambda}, \qquad \tilde{\mathcal{L}}^{(m)}(q) = -\frac{1}{2} \sum_{j=1}^{T} \frac{\left(\sum_{i \in I_j} g_i\right)^2}{\sum_{i \in I_j} h_i + \lambda} + \gamma T \label{eq:pesos_otimos_xgboost}
+\end{equation}
+
+\noindent A partir da Equação (\ref{eq:pesos_otimos_xgboost}), a seleção gulosa de pontos de corte avalia a redução da perda $\mathcal{L}_{\text{split}}$ resultante da partição de um nó $I = I_L \cup I_R$ em subnós esquerdo ($I_L$) e direito ($I_R$):
+
+\begin{equation}
+    \mathcal{L}_{\text{split}} = \frac{1}{2} \left[ \frac{\left(\sum_{i \in I_L} g_i\right)^2}{\sum_{i \in I_L} h_i + \lambda} + \frac{\left(\sum_{i \in I_R} g_i\right)^2}{\sum_{i \in I_R} h_i + \lambda} - \frac{\left(\sum_{i \in I} g_i\right)^2}{\sum_{i \in I} h_i + \lambda} \right] - \gamma \label{eq:split_xgboost}
+\end{equation}
+
+\noindent Adicionalmente ao objetivo regularizado e ao encolhimento por taxa de aprendizado, o XGBoost incorpora a subamostragem aleatória de atributos inspirada no Random Forest, algoritmos conscientes de esparsidade e esboços de quantis ponderados pelas estatísticas de segunda ordem $h_i$ para discretização eficiente de atributos contínuos.
+
+Embora o \textit{XGBoost} mitigue o custo de ordenação por meio de estruturas de blocos em memória e quantis ponderados, a complexidade computacional para construir os histogramas e avaliar a Equação (\ref{eq:split_xgboost}) permanece proporcional tanto ao número total de observações $N$ quanto à dimensionalidade de atributos $p$. Visando superar esse gargalo em bases de dados de larga escala sem comprometer a acurácia preditiva, \citeonline{ke2017lightgbm} propuseram o algoritmo LightGBM.
+
+O LightGBM preserva integralmente a expansão de Taylor de segunda ordem e a função objetivo regularizada expressas nas Equações (\ref{eq:taylor_xgboost} - \ref{eq:split_xgboost}), mas introduz três inovações estruturais e algorítmicas:
+
+\begin{enumerate}
+    \item \textbf{Particionamento Baseado em Histogramas e Crescimento \textit{Leaf-wise}:} Os atributos contínuos são discretizados previamente em $k$ compartimentos inteiros, reduzindo a complexidade de busca do ponto de corte de $\mathcal{O}(N \cdot p)$ para $\mathcal{O}(k \cdot p)$, além de permitir a obtenção do histograma de um nó irmão por simples subtração vetorial em relação ao nó pai. Adicionalmente, em contraste com a estratégia tradicional de expansão por nível de profundidade, o LightGBM adota o crescimento orientado às folhas, particionando iterativamente apenas a folha terminal que proporciona o maior ganho global $\mathcal{L}_{\text{split}}$ em toda a árvore, sujeito a um limite máximo de profundidade para evitar sobreajuste;
+
+    \item \textbf{\gls{GOSS}:} Fundamenta-se na premissa teórica de que instâncias associadas a gradientes de primeira ordem $|g_i|$ de pequena magnitude já se encontram bem ajustadas pelo comitê corrente, contribuindo marginalmente para o ganho de informação. Em cada iteração, o método \gls{GOSS} ordena as observações de forma decrescente por $|g_i|$, retém integralmente o subconjunto $A$ correspondente à fração $a \times 100\%$ de instâncias com os maiores gradientes e sorteia aleatoriamente um subconjunto $B$ de tamanho $b \times |A^c|$ dentre o complemento de instâncias com gradientes reduzidos. Para preservar a distribuição original da perda ao avaliar os candidatos a ponto de corte $d$ sobre o atributo $j$, os gradientes pertencentes a $B$ são amplificados pelo fator constante $\frac{1-a}{b}$, resultando no estimador de ganho aproximado $\tilde{V}_j(d)$:
+    
+    \begin{equation}
+        \tilde{V}_j(d) = \frac{1}{N} \left[ \frac{\left(\sum_{x_i \in A_l} g_i + \frac{1-a}{b}\sum_{x_i \in B_l} g_i\right)^2}{n_l^j(d)} + \frac{\left(\sum_{x_i \in A_r} g_i + \frac{1-a}{b}\sum_{x_i \in B_r} g_i\right)^2}{n_r^j(d)} \right] \label{eq:goss_lightgbm}
+    \end{equation}
+    
+    \noindent em que $A_l = \{x_i \in A \mid x_{ij} \le d\}$, $A_r = \{x_i \in A \mid x_{ij} > d\}$, $B_l = \{x_i \in B \mid x_{ij} \le d\}$, $B_r = \{x_i \in B \mid x_{ij} > d\}$, e os denominadores $n_l^j(d)$ e $n_r^j(d)$ contabilizam o total de observações alocadas aos subnós esquerdo e direito, respectivamente;
+
+    \item \textbf{\gls{EFB}:} Em espaços de alta dimensão com presença de esparsidade, múltiplos atributos são mutuamente exclusivos, isto é, raramente assumem valores não nulos de maneira simultânea. O método EFB reduz a quantidade efetiva de atributos ao fundir variáveis mutuamente exclusivas em um único feixe, deslocando os intervalos de seus \textit{bins} originais por constantes de compensação para preservar a identificabilidade de cada variável. A determinação dos feixes ótimos é reduzida a um problema de coloração de grafos \textit{NP-difícil} — no qual os vértices representam os atributos e as arestas ponderam os conflitos de não exclusividade —, resolvido eficientemente por uma heurística gulosa com taxa de conflito máxima tolerada.
+\end{enumerate}
+
+\section{Métricas}
+
+Por fim, há também a necessidade de se otimizar as métricas de cada um dos modelos, visto que esses determinarão o quanto o modelo se adequa ao problema, e o quanto ele consegue predizer os valores da variável objetivo. Sendo assim, abaixo serão apresentadas as métricas utilizadas e que foram otimizadas:
+
+\begin{itemize}
+    \item \textbf{Coeficiente de Determinação ($\text{R}^2$):} O $\text{R}^2$ mede a proporção da variância total na variável alvo que é explicada pelo modelo. É a métrica primária de precisão.
+    \begin{equation}
+        R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2} = 1 - \frac{\text{RSS}}{\text{TSS}}
+    \end{equation}
+    Onde \gls{RSS} é a Soma dos Quadrados dos Resíduos (erro do modelo) e \gls{TSS} é a variância total dos dados. Um $\text{R}^2$ próximo de 1 indica um ajuste excelente.
+    
+    \item \textbf{Raiz do Erro Quadrático Médio (RMSE):} O \gls{RMSE} é a principal métrica de erro, representando a magnitude média dos desvios. É a raiz quadrada da média dos erros quadrados, mantendo a unidade de medida original (bbl/dia) para interpretação prática.
+    \begin{equation}
+        \text{\gls{RMSE}} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+    \end{equation}
+    A função quadrática dentro da raiz penaliza erros grandes de forma desproporcional, tornando o \gls{RMSE} sensível a \textit{outliers}.
+
+    \item \textbf{Erro Absoluto Médio (MAE):} O \gls{MAE} mede a média dos erros em valor absoluto.
+    \begin{equation}
+         \text{\gls{MAE}} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+    \end{equation}
+    
+    Por não elevar o erro ao quadrado, o MAE é mais robusto contra \textit{outliers} do que o \gls{RMSE} e fornece uma estimativa de erro mais intuitiva.
+
+    \item \textbf{Diferença do Coeficiente de Determinação ($\Delta \text{R}^2$):} Esta métrica avalia a capacidade de \textbf{generalização} do modelo, sendo essencial para identificar o \textit{overfitting}.
+    \begin{equation}
+        \Delta \text{R}^2 = \text{R}^2_{\text{Treino}} - \text{R}^2_{\text{Teste}}
+    \end{equation}
+    Um $\Delta \text{R}^2$ próximo de zero indica que o desempenho do modelo no conjunto de teste é similar ao do treino (boa generalização). Um valor positivo alto é um forte indicador de que o modelo memorizou os dados de treino, perdendo poder preditivo em dados não vistos.
+\end{itemize}

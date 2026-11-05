@@ -1,0 +1,125 @@
+\chapter{Fundamentação Teórica}
+\label{cap:fundamentacao-teorica}
+
+Esta seção estabelece o arcabouço teórico e o estado da arte necessários para a compreensão e desenvolvimento da presente pesquisa, abrangendo a aplicação de conceitos de \gls{PO} e de modelos de \gls{ML} como ferramentas de otimização.
+
+\section{Fundamentos de \gls{PO}}
+\label{sec:po_fundamentos}
+
+A \gls{PO} é uma área do conhecimento aplicada a problemas envolvendo como conduzir e coordenar as chamadas operações (ou ativadades) em um determinado processo, sendo largamente utilizada nas mais distintas áreas, com suas origens sendo atribuídas aos primórdios da Segunda Guerra Mundial.
+%, devido à necessidade de se alocar recursos de forma eficiente, e com o fim do conflito, foi possível observar a eficácia do uso dos métodos aplicados, surgindo assim um interesse na aplicação da \gls{PO} fora do âmbito militar 
+\cite{hillier2013introduccao}.
+
+O estudo de um determinado problema, utilizando técnicas de \gls{PO} envolve as seguintes fases \cite{hillier2013introduccao}:
+
+\begin{enumerate}
+    \item Definir o problema de interesse 
+    \item Coletar dados.
+    \item Formular um modelo matemático para representar o problema.
+    \item Desenvolver um procedimento computacional a fim de derivar soluções para o problema a partir do modelo.
+    \item Testar o modelo e aprimorá-lo conforme necessário.
+    \item Preparar-se para a aplicação contínua do modelo conforme prescrito pela gerência.
+    \item Implementar computacionamente.
+\end{enumerate}
+
+De acordo com \cite{hillier2013introduccao}, para a formulação matemática do problema é necessário definir os seguintes componentes, com essas sendo essenciais para traduzir a questão gerencial em um problema de otimização solucionável:
+
+\begin{itemize}
+    \item \textbf{Variáveis de Decisão:} Representam as escolhas que podem ser manipuladas pelo modelo para buscar o resultado ótimo.
+    \item \textbf{Parâmetros:}  Valores fixos no problema.
+    \item \textbf{Restrições:} Limites físicos, regulatórios ou de recursos do problema que definem a região de soluções viáveis.
+    \item \textbf{Função Objetivo:} O critério de desempenho a ser maximizado ou minimizado, a depender do problema em questão.
+\end{itemize}
+
+Cada problema pode ser classificado de diferentes formas com base em diferentes aspectos, tais classificações serão abordadas nas seguintes subsseções.
+
+\section{Fundamentos de Limpeza de Dados para Modelagem}
+\label{sec:limpeza_dados}
+
+A precisão dos modelos de \gls{ML} é fundamentalmente dependente da qualidade dos dados de treinamento. A literatura demonstra que a coleta massiva de dados, especialmente em grandes volumes, resulta em datasets "sujos" que podem comprometer a acurácia dos resultados de predição. A limpeza de dados é essencial para garantir que a informação esteja precisa e uniforme, resolvendo problemas como incompletude, inconsistência e duplicação \cite{Ridzuan_2019_DataCleansing}.
+
+A ausência de tratamento para valores faltantes ou erros pode gerar incertezas no dataset e produzir resultados distintos e, potencialmente, equivocados para a tomada de decisão. O processo de limpeza de dados é uma etapa complexa e crucial, que tipicamente envolve as seguintes cinco fases \cite{Ridzuan_2019_DataCleansing}:
+
+\begin{enumerate}
+    \item \textbf{Data Analysis (\textit{Análise de Dados}):} É a fase de auditoria, na qual o objetivo é identificar e obter metadados sobre todas as anomalias, erros e inconsistências presentes no banco de dados.
+    \item \textbf{Definition of transformation workflow (\textit{Definição do Fluxo de Trabalho de Transformação}):} Nesta etapa, é definida a sequência de operações e regras de mapeamento necessárias para a detecção e correção das anomalias identificadas na fase anterior.
+    \item \textbf{Verification (\textit{Verificação}):} Consiste na avaliação da correção e da eficácia do fluxo de trabalho de transformação, frequentemente exigindo a interação com especialistas do domínio para validar as transformações aplicadas.
+    \item \textbf{Transformation (\textit{Transformação}):} É a execução dos passos de correção. Os dados são transformados e atualizados utilizando as regras definidas no fluxo de trabalho.
+    \item \textbf{Backflow of cleaned data (\textit{Retorno dos Dados Limpos}):} Fase final onde os dados sujos originais são substituídos pelos dados limpos e validados, garantindo que o dataset de entrada para a modelagem seja de alta qualidade.
+\end{enumerate}
+
+No contexto deste trabalho, a garantia da alta qualidade dos dados utilizados foi um pré-requisito crucial para o treinamento robusto dos modelos \textit{surrogate} propostos. O processo de limpeza e preparação do \textit{dataset} incluiu os seguintes passos:
+
+\begin{itemize}
+    \item \textbf{Estrutura e Consistência:} Padronização e renomeação de colunas (ex: 'Grau API' para 'Grau\_API') e remoção de colunas redundantes ou com baixa variância (como 'Nome Poço ANP' e outras colunas de vazão não essenciais).
+    \item \textbf{Limpeza de Dados:} Remoção de registros duplicados para garantir a integridade.
+    \item \textbf{Tratamento de \textit{Outliers}:} Utilização do algoritmo \textit{IsolationForest} para identificar \textit{outliers}, sendo um algoritmo baseado em árvores, que faz o isolamento dos valores discripantes através de particionamentos aleatórios, levando em conta que tais valores exigem menos divisões para serem separados dos demais valores \cite{liu2008isolation}.
+    \item \textbf{Engenharia de \textit{Features}:} Incorporação de atributos espaciais e operacionais provenientes de bases cadastrais complementares, com o objetivo de enriquecer a representação física dos poços e a capacidade preditiva dos modelos.
+\end{itemize}
+
+\section{Fundamentos de \gls{ML}}
+\label{sec:ml_fundamentos}
+
+\gls{ML} é um subcampo da \gls{IA} cujo objetivo principal é o desenvolvimento de técnicas computacionais que permitam a construção de sistemas capazes de adquirir conhecimento de forma automática, de forma que um sistema de aprendizado é essencialmente um programa de computador que toma decisões baseado em experiências acumuladas através da solução de problemas anteriores \cite{monard2003conceitos}.
+
+Existem diferentes paradigmas de aprendizado, sendo o \textbf{Aprendizado Supervisionado} o mais utilizado em tarefas de regressão, como as aplicadas neste trabalho para a otimização da produção de poços de petróleo. Neste paradigma, o sistema recebe um conjunto de exemplos de treino, onde cada exemplo consiste num par entrada-saída desejada, permitindo que o algoritmo aprenda a mapear novas entradas com base no padrão identificado \cite{monard2003conceitos}.
+
+A versatilidade desses paradigmas permitiu que o \gls{ML} se consolidasse como uma ferramenta científica transversal, sendo aplicada com sucesso em domínios que variam desde a genômica e microbiologia até a engenharia de reservatórios \cite{Asnicar_2024_MachineLearning}. No entanto, a eficácia desses modelos em cenários complexos não são provenientes apenas da escolha do algoritmo, mas da implementação de um fluxo de trabalho rigoroso que prioriza a qualidade dos dados e a validação estatística. Essa perspectiva interdisciplinar reforça que, para que um modelo atue como um emulador confiável de fenômenos físicos — como a vazão de poços de petróleo —, é imprescindível a adoção de protocolos estritos de pré-processamento e limpeza de dados, visando garantir a generalização e evitar o \textit{overfitting} \cite{Asnicar_2024_MachineLearning}.
+
+\subsection{Generalização e \textit{Overfitting}}
+
+Um dos maiores desafios no treinamento de modelos de \gls{ML} é garantir a sua capacidade de generalização, ou seja, a habilidade do sistema em realizar predições corretas para dados novos que não foram utilizados durante a etapa de treinamento \cite{monard2003conceitos}. Quando um modelo falha nesse aspecto, ocorre frequentemente o fenômeno do \textit{overfitting} (sobreajuste).
+
+O \textit{overfitting} acontece quando o algoritmo "decora" as características específicas e os ruídos do conjunto de treinamento, apresentando um desempenho excelente nesta etapa, mas falhando ao ser avaliado em dados desconhecidos \cite{Asnicar_2024_MachineLearning}. Segundo \citeonline{Asnicar_2024_MachineLearning}, um modelo sobreajustado pode ser enganoso, apresentando métricas de validação interna satisfatórias que não se sustentam na prática, o que compromete a sua utilidade em casos reais.
+
+Para mitigar esse risco e assegurar que o modelo identifique apenas os padrões subjacentes reais, é fundamental adotar práticas rigorosas de validação e pré-processamento. Neste estudo, a aplicação do método de \gls{IQR} para a remoção de \textit{outliers} e o uso de técnicas de amostragem aleatória (detalhadas no Capítulo \ref{cap:proposta-e-metodologia}) foram estratégias essenciais para reduzir o ruído nos dados e, consequentemente, prevenir o \textit{overfitting}, garantindo a robustez do modelo \textit{surrogate} para a otimização de poços.
+
+\section{Modelos \textit{Surrogate} na Otimização de Sistemas de Produção}
+\label{sec:surrogate}
+
+Modelos \textit{surrogate} — também referidos na literatura como modelos de resposta aproximada, metamodelos ou emuladores — são aproximações matemáticas de modelos de simulação numericamente intensivos \cite{Asher_2015_SurrogateReview}. A premissa fundamental desta abordagem é a substituição de um simulador de alta fidelidade, que exige alto custo computacional e tempo de execução elevado, por um modelo estatístico ou computacional mais simples que seja capaz de mimetizar o comportamento do código original com precisão aceitável, mas a uma fração do custo original \cite{Asher_2015_SurrogateReview, Sturek_2025_SurrogateReview}.
+
+De acordo com a taxonomia proposta por \citeonline{Asher_2015_SurrogateReview}, os modelos \textit{surrogate} podem ser classificados em três categorias principais:
+\begin{itemize}
+    \item \textbf{Modelos de Fidelidade Reduzida (\textit{Lower-fidelity}):} Versões simplificadas do modelo físico, utilizando malhas mais grossas ou simplificações das equações governantes.
+    \item \textbf{Modelos de Resposta de Baixa Ordem (\textit{Reduced-order}):} Modelos que reduzem a dimensionalidade do sistema original preservando sua dinâmica essencial.
+    \item \textbf{Modelos Baseados em Dados (\textit{Data-driven}):} Também conhecidos como "caixa-preta", estes modelos utilizam técnicas de Aprendizado de Máquina para mapear a relação entre as entradas e saídas do simulador original, sem o conhecimento explícito da física interna do sistema.
+\end{itemize}
+
+Este trabalho foca na terceira categoria, utilizando \gls{ML} para construir emuladores baseados em dados. Como destacado por \citeonline{Sturek_2025_SurrogateReview}, esses modelos são essenciais para viabilizar simulações em tempo real e ciclos de otimização iterativos em ambientes de Indústria 4.0, onde a agilidade na tomada de decisão é um requisito crítico.
+
+\section{Formalização Matemática dos Modelos de Aprendizado de Máquina}
+\label{sec:matematica_modelos}
+
+Conforme discutido na Seção \ref{sec:surrogate}, os modelos baseados em dados utilizam algoritmos de Aprendizado de Máquina para mapear as relações entre as variáveis de entrada e saída. Nesta seção, apresenta-se a fundamentação matemática dos modelos empregados para a construção do \textit{surrogate}, abrangendo desde regressões lineares até arquiteturas complexas de redes neurais e \textit{ensembles}.
+
+No paradigma de aprendizado supervisionado, o objetivo é encontrar uma função de mapeamento $f$ tal que $y = f(\mathbf{x}) + \epsilon$, minimizando uma \textbf{Função de Perda}, como o \gls{MSE}, para garantir a capacidade de generalização e evitar o \textit{overfitting} \cite{Asnicar_2024_MachineLearning, monard2003conceitos}.
+
+\subsection{Regressores Lineares e Regularização}
+
+Os modelos lineares fundamentam-se na premissa de que a variável de saída pode ser expressa como uma combinação linear das variáveis de entrada: $\hat{y} = w_0 + \sum_{i=1}^{n} w_i x_i$ \cite{James_2013_ISLR}. Para mitigar o risco de \textit{overfitting} e controlar a magnitude dos coeficientes, aplicam-se técnicas de regularização que penalizam a complexidade do modelo:
+
+\begin{itemize}
+    \item \textbf{LinearRegression:} Implementa o método de \gls{OLS}, buscando minimizar a soma dos resíduos quadrados sem a aplicação de penalidades adicionais \cite{James_2013_ISLR}.
+    \item \textbf{Lasso ($L_1$) e Ridge ($L_2$):} O modelo \textit{Ridge} introduz uma penalidade proporcional ao quadrado dos pesos ($\lambda ||w||^2_2$), enquanto o \textit{Lasso} utiliza a norma $L_1$ ($\lambda ||w||_1$) \cite{James_2013_ISLR}. A característica distintiva do \textit{Lasso} é sua capacidade de realizar a seleção de variáveis, reduzindo a zero os coeficientes de preditores menos relevantes.
+\end{itemize}
+
+\subsection{Modelos de Vizinhança e Suporte (KNN e SVR)}
+
+\begin{itemize}
+    \item \textbf{\gls{KNN}:} É um método não-paramétrico que baseia suas predições na similaridade local. A saída para uma nova instância é calculada como a média das saídas observadas nos $k$ vizinhos mais próximos dentro do espaço euclidiano de características \cite{monard2003conceitos, James_2013_ISLR}.
+    \item \textbf{\gls{SVR}:} Originário da teoria de suporte estatístico, o \gls{SVR} busca encontrar um hiperplano de regressão que mantenha a maior parte dos dados dentro de uma margem de tolerância $\epsilon$. O uso de funções de \textit{kernel} permite que o modelo mapeie as entradas em espaços de alta dimensão, capturando relações não-lineares complexas \cite{Hastie_2009_ESL, monard2003conceitos}.
+\end{itemize}
+
+\subsection{Modelos Baseados em Árvores e Ensembles (Random Forest e XGBoost)}
+
+Os métodos de conjunto (\textit{ensembles}) combinam múltiplas árvores de decisão para produzir um modelo preditivo mais robusto.
+
+\begin{itemize}
+    \item \textbf{Random Forest:} Baseia-se no princípio de \textit{Bagging} (\textit{Bootstrap Aggregating}), onde diversas árvores são treinadas de forma independente em subamostras dos dados. A predição final resulta da média dessas subestimativas, o que reduz drasticamente a variância sem aumentar o viés \cite{Breiman_2001_RandomForests, James_2013_ISLR}.
+    \item \textbf{XGBoost:} Representa uma implementação otimizada de \textit{Gradient Boosting}. Diferente do \textit{Bagging}, as árvores são construídas sequencialmente para minimizar os erros residuais das árvores predecessoras por meio do gradiente da função de perda, incorporando termos de regularização para assegurar a generalização do modelo \cite{Chen_2016_XGBoost}.
+\end{itemize}
+
+% \subsection{Redes Neurais Artificiais (MLP)}
+
+% As Redes Neurais do tipo \gls{MLP} são compostas por camadas de neurônios altamente interconectados. A saída de cada unidade é processada por $\hat{y} = \sigma (\mathbf{w}^T \mathbf{x} + b)$, onde $\sigma$ representa uma função de ativação não-linear (como ReLU ou Sigmoide), essencial para a aproximação de funções complexas \cite{Goodfellow_2016_DeepLearning}. O processo de aprendizado fundamenta-se no algoritmo de \textit{backpropagation}, que utiliza o gradiente descendente para ajustar os pesos e vieses da rede, minimizando o erro de predição em relação aos dados do simulador original \cite{monard2003conceitos, Goodfellow_2016_DeepLearning}.

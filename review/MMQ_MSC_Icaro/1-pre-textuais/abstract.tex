@@ -1,0 +1,10 @@
+% Separe as Keywords por ponto
+This Master's qualification proposal presents the application of Machine Learning models for the optimization of offshore oil well simulators. These data-driven models, through specific training, are capable of mimicking the behavior of physical simulators with acceptable precision and low computational cost.
+The methodology covers the extraction of real-world data from Petrobras' Public Data Consultation (CDP) system, spanning from January 2023 to August 2025. 
+The workflow included a rigorous data cleansing process, feature engineering, and mathematical transformations for variance stabilization.
+Computational experiments were conducted comparing 8 (eight) Machine Learning algorithms, subjected to hyperparameter optimization via \textit{GridSearchCV}. 
+Results demonstrate that the \textit{Random Forest Regressor}-based model achieved the best performance, reaching a coefficient of determination ($R^2$) of 0.9272 and reducing the root mean squared error (RMSE) by more than 58\% compared to linear models.
+As subsequent steps leading up to the thesis defense, it is intended to study and implement Deep Learning and Physics-Informed Neural Networks (PINN) models, as well as integrate the final predictive model with the \texttt{gurobipy} optimization library to obtain optimized operational setpoints.
+It is concluded that the non-linear approach is essential for capturing complex reservoir interactions, validating the use of surrogate models as efficient tools for offshore production management.
+
+\keywords{Machine Learning. Surrogate Models. Optimization. Oil Wells.}

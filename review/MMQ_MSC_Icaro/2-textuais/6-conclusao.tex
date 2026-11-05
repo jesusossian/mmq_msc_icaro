@@ -1,0 +1,8 @@
+\chapter{Conclusão}
+\label{cap:conclusao}
+
+Este trabalho conseguiu cumprir seu objetivo de desenvolver um modelo de \gls{ML} que se adeque aos dados de produção de poços de petróleo marítimo a fim de otimizar sua produção. O problema em questão, após análises comparativas das métricas dos modelos, demonstrou possuir uma natureza não linear, dado que modelos mais simples, que consideram o problema como linear, não conseguiram se adequar aos dados, explicando apenas cerca de 40.5\% da variabilidade dos dados com \gls{RMSE} e \gls{MAE} elevados, com valores que representam 59.52\% e 34.76\% da média de produção diária, respectivamente.
+
+Dentre todos os modelos, o \textbf{LightGBM} foi aquele que se destacou por conseguir se adequar os dados, conseguindo predizer bem os valores de produção de petróleo diário, com uma taxa de acerto de 82.67\%, com um \gls{RMSE} em torno de 32.12\% e um \gls{MAE} com valor de 21.79\%, em relação à média de produção diária dos poços, e apresentando um um bom tempo para o treinamento com os dados utilizados, levando 1.58 segundo para a realização do treinamento no modelo com os melhores hiperparâmetros, determinados pelo \texttt{GridSearchCV}.
+
+De modo a complementar os testes realizados nesse trabalho, foi utilizado o \textit{solver} Gurobi, a fim de avaliar o desempenho dos 3 modelos que tiveram as melhores métricas, utilizando os modelos treinados como uma das restrições de um problema de \gls{PO}. Após as execuções dos testes com o \textit{solver}, o \textbf{LightGBM} foi aquele que conseguiu indicar os valores das variáveis que conseguem maximizar a Vazão Diária de Petróleo.

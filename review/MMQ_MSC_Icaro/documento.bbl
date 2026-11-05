@@ -1,0 +1,233 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.7 }
+
+\bibitem[Asher \textit{et al.} 2015]{Asher_2015_SurrogateReview}
+\abntrefinfo{Asher \textit{et al.}}{ASHER \textit{et al.}}{2015}
+{ASHER, M.~J.; CROKE, B. F.~W.; JAKEMAN, A.~J.; PEETERS, L. J.~M. A review of
+  surrogate models and their application to groundwater modeling.
+\textbf{Water Resources Research}, v.~51, n.~8, p. 5957--5973, 2015.}
+
+\bibitem[Asnicar \textit{et al.} 2024]{Asnicar_2024_MachineLearning}
+\abntrefinfo{Asnicar \textit{et al.}}{ASNICAR \textit{et al.}}{2024}
+{ASNICAR, F.; THOMAS, A.~M.; PASSERINI, A.; WALDRON, L.; SEGATA, N. Machine
+  learning for microbiologists.
+\textbf{Nature Reviews Microbiology}, v.~22, n.~4, p. 191--205, Apr 2024.}
+
+\bibitem[{Associação Brasileira de Normas Técnicas} 2008]{abnt15213}
+\abntrefinfo{{Associação Brasileira de Normas Técnicas}}{{Associação
+  Brasileira de Normas Técnicas}}{2008}
+{{Associação Brasileira de Normas Técnicas}. \textbf{{ABNT NBR 15213}: Gás
+  natural e outros combustíveis gasosos - Cálculo do poder calorífico,
+  densidade absoluta, densidade relativa e índice de Wobbe a partir da
+  composição.} Rio de Janeiro, 2008.}
+
+\bibitem[{Associação Brasileira de Normas Técnicas} 2013]{abnt14065}
+\abntrefinfo{{Associação Brasileira de Normas Técnicas}}{{Associação
+  Brasileira de Normas Técnicas}}{2013a}
+{{Associação Brasileira de Normas Técnicas}. \textbf{{ABNT NBR 14065}:
+  Destilados de petróleo e óleos viscosos — Determinação da massa
+  específica e da densidade relativa pelo densímetro digital.} Rio de
+  Janeiro, 2013.}
+
+\bibitem[{Associação Brasileira de Normas Técnicas} 2013]{abnt7148}
+\abntrefinfo{{Associação Brasileira de Normas Técnicas}}{{Associação
+  Brasileira de Normas Técnicas}}{2013b}
+{{Associação Brasileira de Normas Técnicas}. \textbf{{ABNT NBR 7148}:
+  Petróleo e produtos de petróleo --- Determinação da massa específica,
+  densidade relativa e {API} --- Método do densímetro}. Rio de Janeiro,
+  2013.}
+
+\bibitem[{Associação Brasileira de Normas Técnicas} 2020]{abnt15358}
+\abntrefinfo{{Associação Brasileira de Normas Técnicas}}{{Associação
+  Brasileira de Normas Técnicas}}{2020}
+{{Associação Brasileira de Normas Técnicas}. \textbf{{ABNT NBR 15358}: Rede
+  de distribuição interna para gás combustível em instalações de uso não
+  residencial de até 400 kPa — Projeto e execução.} Rio de Janeiro, 2020.}
+
+\bibitem[Basak \textit{et al.} 2007]{basak_svr}
+\abntrefinfo{Basak \textit{et al.}}{BASAK \textit{et al.}}{2007}
+{BASAK, D.; PAL, S.; PATRANABIS, D. Support vector regression.
+\textbf{Neural Information Processing – Letters and Reviews}, v.~11, 11
+  2007.}
+
+\bibitem[Biau 2012]{biau2012analysis}
+\abntrefinfo{Biau}{BIAU}{2012}
+{BIAU, G. Analysis of a random forests model.
+\textbf{Journal of Machine Learning Research}, v.~13, p. 1063--1095, 2012.}
+
+\bibitem[Breiman 2001]{Breiman_2001_RandomForests}
+\abntrefinfo{Breiman}{BREIMAN}{2001}
+{BREIMAN, L. Random forests.
+\textbf{Machine Learning}, v.~45, p. 5--32, 10 2001.}
+
+\bibitem[Chakrabarti \textit{et al.} 2005]{CHAKRABARTI20051}
+\abntrefinfo{Chakrabarti \textit{et al.}}{CHAKRABARTI \textit{et al.}}{2005}
+{CHAKRABARTI, S.; HALKYARD, J.; CAPANOGLU, C. Chapter 1 - historical
+  development of offshore structures. In:  CHAKRABARTI, S.~K. (Ed.).
+  \textbf{Handbook of Offshore Engineering}. London: Elsevier, 2005. p. 1--38.
+ISBN 978-0-08-044381-2.
+Dispon{\'\i}vel em:
+  \url{https://www.sciencedirect.com/science/article/pii/B9780080443812500047}.}
+
+\bibitem[Chen e Guestrin 2016]{Chen_2016_XGBoost}
+\abntrefinfo{Chen e Guestrin}{CHEN; GUESTRIN}{2016}
+{CHEN, T.; GUESTRIN, C. Xgboost: A scalable tree boosting system.
+\textbf{CoRR}, abs/1603.02754, 2016.
+Dispon{\'\i}vel em: \url{https://doi.org/10.48550/arXiv.1603.02754}.}
+
+\bibitem[Friedman 2001]{friedman2001gradient}
+\abntrefinfo{Friedman}{FRIEDMAN}{2001}
+{FRIEDMAN, J. Greedy function approximation: A gradient boosting machine.
+\textbf{The Annals of Statistics}, v.~29, p. 1189--1232, 10 2001.}
+
+\bibitem[Gao \textit{et al.} 2023]{Gao_2023_DesignNumerical}
+\abntrefinfo{Gao \textit{et al.}}{GAO \textit{et al.}}{2023}
+{GAO, S.; LI, H.; NIE, S.; AI, Y.; LUO, H.; LI, Y. Design and numerical
+  simulation study of a novel aicd for water control and gas production in gas
+  wells.
+\textbf{ACS Omega}, American Chemical Society, v.~8, p. 39052--39066, 2023.}
+
+\bibitem[{Gurobi} 2023]{gurobiml}
+\abntrefinfo{{Gurobi}}{{Gurobi}}{2023}
+{{Gurobi}. \textbf{Embed your trained machine learning models directly into
+  Gurobi.} 2023.
+Dispon{\'\i}vel em:
+  \url{https://www.gurobi.com/misc/lp/all/gurobi-machine-learning}. Acesso em:
+  17 aug. 2026.}
+
+\bibitem[Hastie \textit{et al.} 2009]{Hastie_2009_ESL}
+\abntrefinfo{Hastie \textit{et al.}}{HASTIE \textit{et al.}}{2009}
+{HASTIE, T.; TIBSHIRANI, R.; FRIEDMAN, J. \textbf{The Elements of Statistical
+  Learning: Data Mining, Inference, and Prediction}. 2nd. ed. New York:
+  Springer Science \& Business Media, 2009. Dispon{\'\i}vel em:
+  \url{https://web.stanford.edu/~hastie/ElemStatLearn/}.}
+
+\bibitem[Hillier e Lieberman 2013]{hillier2013introduccao}
+\abntrefinfo{Hillier e Lieberman}{HILLIER; LIEBERMAN}{2013}
+{HILLIER, F.~S.; LIEBERMAN, G.~J. \textbf{Introdução à pesquisa
+  operacional}. [S.l.]: McGraw Hill Brasil, 2013.}
+
+\bibitem[IEA 2025]{iea2025world}
+\abntrefinfo{IEA}{IEA}{2025}
+{IEA. \textbf{World Energy Outlook 2025}.
+Paris, 2025. Dispon{\'\i}vel em:
+  \url{https://www.iea.org/reports/world-energy-outlook-2025}.}
+
+\bibitem[James \textit{et al.} 2013]{James_2013_ISLR}
+\abntrefinfo{James \textit{et al.}}{JAMES \textit{et al.}}{2013}
+{JAMES, G.; WITTEN, D.; HASTIE, T.; TIBSHIRANI, R. \textbf{An Introduction to
+  Statistical Learning: with Applications in R}. [S.l.]: Springer, 2013.}
+
+\bibitem[Kavlakoglu 2021]{ibm_knn}
+\abntrefinfo{Kavlakoglu}{KAVLAKOGLU}{2021}
+{KAVLAKOGLU, E. \textbf{O que é o algoritmo k-nearest neighbors (KNN)?} 2021.
+Dispon{\'\i}vel em: \url{https://www.ibm.com/br-pt/think/topics/knn}.}
+
+\bibitem[Ke \textit{et al.} 2017]{ke2017lightgbm}
+\abntrefinfo{Ke \textit{et al.}}{KE \textit{et al.}}{2017}
+{KE, G.; MENG, Q.; FINLEY, T.; WANG, T.; CHEN, W.; MA, W.; YE, Q.; LIU, T.-Y.
+  Lightgbm: A highly efficient gradient boosting decision tree.
+Curran Associates, Inc., v.~30, 2017.
+Dispon{\'\i}vel em:
+  \url{https://proceedings.neurips.cc/paper\_files/paper/2017/file/6449f44a102fde848669bdd9eb6b76fa-Paper.pdf}.}
+
+\bibitem[Liu \textit{et al.} 2008]{liu2008isolation}
+\abntrefinfo{Liu \textit{et al.}}{LIU \textit{et al.}}{2008}
+{LIU, F.~T.; TING, K.~M.; ZHOU, Z.-H. Isolation forest. In:  IEEE. \textbf{2008
+  eighth ieee international conference on data mining}. [S.l.], 2008. p.
+  413--422.}
+
+\bibitem[Loh 2014]{loh2014fifty}
+\abntrefinfo{Loh}{LOH}{2014}
+{LOH, W.-Y. Fifty years of classification and regression trees.
+\textbf{International Statistical Review}, v.~82, p. 329--348, 06 2014.}
+
+\bibitem[Martins \textit{et al.} 2015]{Martins_2015}
+\abntrefinfo{Martins \textit{et al.}}{MARTINS \textit{et al.}}{2015}
+{MARTINS, S. S.~S.; SILVA, M.~P.; AZEVEDO, M.~O.; SILVA, V.~P. {Produção de
+  Petróleo e Impactos Ambientais: Algumas Considerações}.
+\textbf{HOLOS}, v.~6, n. 1807-1600, p. 54--76, 2015.
+ISSN 1807-1600.}
+
+\bibitem[MME 2023]{MME_2023}
+\abntrefinfo{MME}{MME}{2023}
+{MME, M. \textbf{Como uma plataforma tira petróleo do fundo do mar?} 2023.
+Dispon{\'\i}vel em:
+  \url{https://www.gov.br/mme/pt-br/assuntos/noticias/como-uma-plataforma-tira-petroleo-do-fundo-do-mar}.
+  Acesso em: 05 nov. 2025.}
+
+\bibitem[Monard e Baranauskas 2003]{monard2003conceitos}
+\abntrefinfo{Monard e Baranauskas}{MONARD; BARANAUSKAS}{2003}
+{MONARD, M.~C.; BARANAUSKAS, J.~A. Conceitos sobre aprendizado de máquina.
+\textbf{Sistemas inteligentes - Fundamentos e aplicações}, v.~1, n.~1, p.~32,
+  2003.}
+
+\bibitem[Morais 2011]{Morais_2011}
+\abntrefinfo{Morais}{MORAIS}{2011}
+{MORAIS, J. M.~d. {Determinantes das Tecnologias de Produção de Petróleo no
+  Mar}.
+\textbf{Radar - Tecnologia, Produção e Comércio Exterior}, IPEA, n.~17, p.
+  27--34, 2011.
+Dispon{\'\i}vel em: \url{http://repositorio.ipea.gov.br/handle/11058/3460}.}
+
+\bibitem[Müller \textit{et al.} 2001]{muller2001introduction}
+\abntrefinfo{Müller \textit{et al.}}{MüLLER \textit{et al.}}{2001}
+{MüLLER, K.-R.; MIKA, S.; RäTSCH, G.; TSUDA, K.; SCHöLKOPF, B. An
+  introduction to kernel-based learning algorithms.
+\textbf{IEEE Transactions on Neural Networks}, v.~12, p. 181--201, 02 2001.}
+
+\bibitem[Portella \textit{et al.} 2022]{portella2022tunaoil}
+\abntrefinfo{Portella \textit{et al.}}{PORTELLA \textit{et al.}}{2022}
+{PORTELLA, F.; BUCHACA, D.; RODRIGUES, J.~R.; BERRAL, J.~L. {TunaOil}: A tuning
+  algorithm strategy for reservoir simulation workloads.
+\textbf{Journal of Computational Science}, v.~63, p. 101811, 2022.
+ISSN 1877-7503.}
+
+\bibitem[Ridzuan e {Wan Zainon} 2019]{Ridzuan_2019_DataCleansing}
+\abntrefinfo{Ridzuan e {Wan Zainon}}{RIDZUAN; {Wan Zainon}}{2019}
+{RIDZUAN, F.; {Wan Zainon}, W. M.~N. A review on data cleansing methods for big
+  data.
+\textbf{Procedia Computer Science}, v.~161, p. 731--738, 2019.
+ISSN 1877-0509.
+The Fifth Information Systems International Conference, 23-24 July 2019,
+  Surabaya, Indonesia.}
+
+\bibitem[Sikanyika \textit{et al.} 2023]{Sikanyika_2023_Numerical}
+\abntrefinfo{Sikanyika \textit{et al.}}{SIKANYIKA \textit{et al.}}{2023}
+{SIKANYIKA, E.~W.; WU, Z.; MBAROUK, M.~S.; MAFIMBA, A.~M.; ELBALOULA, H.~A.;
+  JIANG, S. Numerical simulation of the oil production performance of different
+  well patterns with water injection.
+\textbf{Energies}, MDPI, v.~16, p.~91, 2023.}
+
+\bibitem[Tsukada \textit{et al.} 2007]{Tsukada_2007}
+\abntrefinfo{Tsukada \textit{et al.}}{TSUKADA \textit{et al.}}{2007}
+{TSUKADA, R.~I.; YAMAMOTO, M.; MOROOKA, C.~K. {Análise de Operação da
+  Instalação de Risers e Descida de BOP em Sondas Flutuantes de
+  Perfuração}. In:  \textbf{PDPETRO - Congresso Brasileiro de Pesquisa e
+  Desenvolvimento em Petróleo e Gás}. Campinas, SP: [s.n.], 2007. p.
+  2.4.308--1--2.4.308--9.}
+
+\bibitem[Vapnik 1995]{vapnik1995nature}
+\abntrefinfo{Vapnik}{VAPNIK}{1995}
+{VAPNIK, V.~N. \textbf{The Nature of Statistical Learning Theory}. New York,
+  NY: Springer-Verlag, 1995.
+ISBN 978-0-387-98780-4.}
+
+\bibitem[Wu \textit{et al.} 2025]{Wu_2025_OptimizationWellPatterns}
+\abntrefinfo{Wu \textit{et al.}}{WU \textit{et al.}}{2025}
+{WU, G.; MA, Y.; CAO, Y.; ZHANG, A.; LIU, W.; WANG, J.; YANG, X. Optimization
+  of well patterns in offshore low-permeability thin interbedded reservoirs: A
+  numerical simulation study in the bozhong oilfield, china.
+\textbf{Energies}, MDPI, v.~18, p.~285, 2025.}
+
+\bibitem[Šturek e Lazarova-Molnar 2025]{Sturek_2025_SurrogateReview}
+\abntrefinfo{Šturek e Lazarova-Molnar}{ŠTUREK; LAZAROVA-MOLNAR}{2025}
+{ŠTUREK, D.; LAZAROVA-MOLNAR, S. Surrogate modeling: Review and opportunities
+  for expert knowledge integration.
+\textbf{Procedia Computer Science}, Elsevier B.V., v.~257, p. 826--833, 2025.}
+
+\end{thebibliography}

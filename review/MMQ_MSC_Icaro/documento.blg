@@ -1,0 +1,76 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: documento.aux
+The style file: abntex2-alf.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Database file #1: abntex2-options.bib
+Database file #2: 3-pos-textuais/referencias.bib
+Warning--entry type for "abnt7148" isn't style-file defined
+--line 232 of file 3-pos-textuais/referencias.bib
+Warning--entry type for "abnt14065" isn't style-file defined
+--line 240 of file 3-pos-textuais/referencias.bib
+Warning--entry type for "abnt15358" isn't style-file defined
+--line 248 of file 3-pos-textuais/referencias.bib
+Warning--entry type for "abnt15213" isn't style-file defined
+--line 256 of file 3-pos-textuais/referencias.bib
+Warning--entry type for "ibm_knn" isn't style-file defined
+--line 264 of file 3-pos-textuais/referencias.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
++---------------------------------------------------------+
+| Estilo bibliográfico abntex2-alf.bst versão v-1.9.7           |
+| Em caso de dúvidas ou problemas com este estilo procure |
+| http://www.abntex.net.br/                               |
++---------------------------------------------------------+
+You've used 39 entries,
+            6714 wiz_defined-function locations,
+            1438 strings with 16399 characters,
+and the built_in function-call counts, 41507 in all, are:
+= -- 3930
+> -- 1147
+< -- 628
++ -- 1059
+- -- 337
+* -- 2807
+:= -- 5190
+add.period$ -- 128
+call.type$ -- 41
+change.case$ -- 403
+chr.to.int$ -- 103
+cite$ -- 34
+duplicate$ -- 3135
+empty$ -- 2343
+format.name$ -- 1710
+if$ -- 9066
+int.to.chr$ -- 5
+int.to.str$ -- 3
+missing$ -- 689
+newline$ -- 177
+num.names$ -- 171
+pop$ -- 853
+preamble$ -- 1
+purify$ -- 152
+quote$ -- 0
+skip$ -- 3509
+stack$ -- 1
+substring$ -- 1711
+swap$ -- 1315
+text.length$ -- 50
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 2
+warning$ -- 0
+while$ -- 256
+width$ -- 0
+write$ -- 551
+(There were 5 warnings)

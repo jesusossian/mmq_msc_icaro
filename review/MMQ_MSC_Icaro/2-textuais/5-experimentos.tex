@@ -1,0 +1,189 @@
+\chapter{Experimentos Computacionais}
+\label{cap:experimentos}
+
+Este capítulo apresenta a consolidação e a discussão aprofundada dos resultados obtidos através da otimização e avaliação de diversas famílias de algoritmos de Machine Learning. O objetivo primário foi identificar o modelo com o melhor balanço entre a \textbf{precisão preditiva} (maior $\text{R}^2$ de Teste e menores \gls{RMSE} e \gls{MAE} de Teste) e a \textbf{capacidade de generalização} ($\Delta \text{R}^2$ minimizado) para a previsão da Vazão Diária de Petróleo.
+
+Todos os modelos foram treinados utilizando o \textit{dataframe}, que foi gerado a partir dos procedimentos explicados no Capítulo \ref{cap:proposta-e-metodologia}. A média de produção do \textit{dataframe} final foi utilizada como \textit{baseline} de comparação dos modelos, com essa estatística tendo o valor de $\mathbf{2481.8066}$ bbl/dia, e a partir do qual o \gls{RMSE} é percentualmente avaliado.
+
+\section{Métricas Consolidadas de Desempenho}
+\label{sec:metricas}
+
+A Tabela \ref{tab:metricas_consolidadas_capitulo} resume as métricas de desempenho de precisão ($\text{R}^2$ e RMSE), generalização ($\Delta \text{R}^2$) e eficiência computacional (\textit{Tempo de Treinamento em segundos}) para os oito modelos otimizados.
+
+\begin{table}[h!]
+    \centering
+    \captionsetup{justification=centering}
+    \caption{Métricas Consolidadas de Desempenho dos Modelos}
+    \label{tab:metricas_consolidadas_capitulo}
+    \small 
+    \setlength{\tabcolsep}{3pt} % Compressão horizontal
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{p{3.5cm}ccccccccc} 
+        \toprule
+        Modelo & \makecell{$\text{R}^2$ \\ Treino} & $\text{R}^2$ \textbf{Teste} & \makecell{RMSE \\ Teste} & \makecell{MAE \\ Teste} & $\Delta \text{R}^2$ & \makecell{RMSE Teste / \\ Média} & \makecell{MAE Teste / \\ Média} & \makecell{Tempo \\ (segundos)} \\
+        \midrule
+        Regressão Linear & $0.6127$ & $0.405$ & $1477.0898$ & $862.5887$ & $0.2077$ & $59.52\%$ & $34.76\%$ & $0.0248$ \\
+        Ridge & $0.6127$ & $0.405$ & $1477.093$ & $862.5752$ & $0.2077$ & $59.52\%$ & $34.76\%$ & $0.0046$ \\
+        Lasso & $0.6118$ & $0.4032$ & $1479.3423$ & $860.7121$ & $0.2086$ & $59.61\%$ & $34.68\%$ & $3.1099$ \\
+        \midrule
+        Random Forest & $0.9924$ & $0.8145$ & $824.0745$ & $543.4489$ & $0.1779$ & $33.2\%$ & $21.9\%$ & $28.6838$ \\
+        XGBoost & $0.998$ & $0.8347$ & $778.5747$ & $519.5239$ & $0.1633$ & $31.37\%$ & $20.93\%$ & $5.4837$ \\
+        K-NN & $1.0000$ & $0.6815$ & $1080.7433$ & $679.2965$ & $0.3185$ & $43.55\%$ & $27.37\%$ & $0.0179$ \\
+        SVR & $0.8494$ & $0.7611$ & $935.838$ & $632.4903$ & $0.0883$ & $37.71\%$ & $25.49\%$ & $2.986$ \\
+        LightGBM & $0.9967$ & $0.8267$ & $797.1118$ & $540.7035$ & $0.17$ & $32.12\%$ & $21.79\%$ & $1.5829$ \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\section{Análise e Discussão dos Resultados}
+
+A análise dos resultados se divide em três pontos principais: a performance dos modelos lineares, o salto de precisão dos modelos não-lineares, e a comparação de \textit{trade-offs} entre os modelos de maior performance.
+
+\subsection{Performance dos Modelos Lineares (Base)}
+Os modelos de Regressão Linear, Ridge e Lasso apresentaram um $\text{R}^2$ de Teste de aproximadamente $\mathbf{0.40}$. Este resultado indica que a abordagem linear consegue explicar apenas 40\% da variabilidade da vazão de petróleo. O erro associado é extremamente alto, com o valor \gls{RMSE} estando acima de $\mathbf{1477}$ bbl/dia nos 3 modelos, o que representa mais $\mathbf{59\%}$ da produção média. Quando é observada a métrica de \gls{MAE}, a magitude dos erros foram inferiores, apresentando valores entre $860.7121$ e $862.5887$ bbl/dia, o que representa de $34.68\%$ a $34.76\%$ da produção média. Porém, é importante ressaltar que a métrica \gls{RMSE} é mais sensível a grandes erros. Por fim, ao analisar o $\Delta \text{R}^2$ dos modelos lineares, essa métrica apresentou valores baixos, entre $0.2077$ e $0.2086$, o que, aliado ao baixo $R^2$ de treino, indica que os modelos não decoraram os dados de treino.
+
+A partir do desempenho dos modelos lineares, confirma-se que a relação entre as variáveis operacionais e a Vazão de Petróleo Diária é intrinsecamente não linear, evidenciando que a rigidez estrutural dessas formulações é insuficiente para capturar a complexidade física do problema.
+
+\subsection{O Salto de Precisão dos Modelos Não-Lineares}
+A migração para algoritmos capazes de mapear relações não-lineares resultou em um aumento considerável no poder preditivo:
+
+\begin{itemize}
+    \item O $\text{R}^2$ de Teste subiu de $0.40$ para mais de $\mathbf{0.81}$ nos melhores modelos.
+    \item O \gls{RMSE} foi reduzido para valores entre $\mathbf{778}$ e $\mathbf{1081}$ bbl/dia.
+    \item O \gls{MAE} foi reduzido para valores entre $\mathbf{519}$ e $\mathbf{680}$ bbl/dia.
+\end{itemize}
+
+Os modelos \textbf{XGboost}, \textbf{LightGBM} e \textbf{Random Forest} se destacaram, alcançando os melhores resultados de $\text{R}^2$ de Teste, todos com valores superiores a $0.81$, uma baixa magnitude de erros, com \gls{RMSE} estando entre $778$ e $825$ bbl/dia e \gls{MAE} estando entre $519$ e $544$ bbl/dia, e uma boa generalização, com $\Delta \text{R}^2$ entre $0.16$ e $0.18$. Dadas essas métricas, tais modelos serão considerados de alta performance para esse problema.
+
+\subsection{Análise do Trade-Off: Precisão, Generalização e Tempo}
+
+A escolha do modelo final é determinada pelo balanceamento entre precisão, generalização e eficiência computacional, com essa última sendo medida pelo tempo de treinamento do modelo.
+
+\begin{itemize}
+    \item \textbf{Generalização ($\Delta \text{R}^2$):} O \gls{SVR} apresentou a melhor generalização absoluta ($\Delta \text{R}^2 = 0.0883$), mas sua precisão final ($\text{R}^2=0.7611$) foi baixa em relação aos melhores algoritmos. Entre os modelos de alta performance, o \textbf{XGBoost} apresentou a menor perda de generalização ($\Delta \text{R}^2 = 0.1633$), indicando que sua estrutura é mais robusta e menos suscetível ao \textit{overfitting} do que o LightGBM e o Random Forest.
+    
+    \item \textbf{Eficiência (Tempo de Treinamento):} O \gls{KNN} apresentou valores satisfatórios em relação ao tempo de treinamento, sendo inferior a $\mathbf{1}$ segundo, sendo o menor dentre os modelos não lineares, porém apresentou uma baixa precisão ($\text{R}^2 = 0.6815$), sendo a menor dentre os outros modelos de sua mesma famíla. Quanto aos modelos de alta performance, o \textbf{LightGBM} se mostrou o mais eficiente, treinando em aproximadamente $\mathbf{1.58}$ segundos. Esse baixo tempo de treinamento representa um valor excelente dada sua alta capacidade preditiva ($\text{R}^2 = 0.8267$).
+\end{itemize}
+
+Dada a proximidade dos melhores modelos em relação às métricas de erro, levando em consideração a baixa amplitude do \gls{RMSE} e do \gls{MAE}, de $\mathbf{45.4998}$ e $\mathbf{23.925}$ respectivamente, tais estatíticas não foram tão significantes para a escolha entre esses modelos.
+
+\section{Definição do Modelo Final}
+\label{sec:modelo_final}
+
+Com base na análise das métricas, os modelos \textbf{XGBoost} e \textbf{LightGBM} se mostraram os principais candidatos para modelos finais.
+
+\begin{itemize}
+    \item XGBoost atingiu o melhor $\text{R}^2$ de Teste, com o valor de $\mathbf{0.8347}$, porém, ainda próximo do LightGBM, que alcançou um $\text{R}^2$ de Teste de $\mathbf{0.8267}$.
+    \item O \gls{RMSE} dos modelos também foram próximos, de $\mathbf{778.5747}$ e $\mathbf{797.1118}$ bbl/dia, para o XGBoost e o LightGBM respectivamente, o que representa uma diferença de apenas $18.5371$ bbl/dia. Algo similar ocorre em relação ao \gls{MAE}, onde a diferença entre as métricas dos modelos foi de apenas $21.1796$ bbl/dia.
+    \item Ambos os modelos atingiram generalização próximas, com $\Delta R^2$ de $\mathbf{0.1633}$ para o XGBoost e $\mathbf{0.17}$ para o LightGBM.
+\end{itemize}
+
+A maior diferença entre os 2 modelos está no tempo de treinamento, de modo que o \textbf{LightGBM} apresentou um tempo de execução menor em relação ao \textbf{XGBoost}, havendo uma diferença de aproximadamente 4 segundos no treinamento dos modelos, o que justifica a escolha do modelo mais eficiente, principalmente no caso de haver a necessidade de um retreinamento frequente. Desse modo, o modelo \textbf{LightGBM} se mostrou aquele que melhor se adaptou ao problema abordado nesse trabalho.
+
+Todos os experimentos com os modelos foram realizados em um computador com as seguintes configurações:
+
+\begin{itemize}
+    \item \textbf{Processador:} AMD Ryzen 5 5600GT com 3.60 GHz.
+    \item \textbf{Memória:} 16 GB de RAM.
+    \item \textbf{Placa de Vídeo:} NVIDIA GeForce RTX 3050 com 8 GB de VRAM.
+    \item \textbf{Sistema Operacional:} Windows 11 Home
+    \item \textbf{Linguagem de Programação:} Python 3.14.2
+\end{itemize}
+
+\section{Testes com o Gurobi}
+
+Para avaliar o desempenho dos modelos no ambiente de otimização matemática com o \textit{solver} Gurobi, foram formuladas instâncias do problema que utilizaram os três modelos de \gls{ML} que obtiveram o melhor desempenho preditivo na Seção \ref{sec:metricas}:
+
+\begin{itemize}
+    \item XGBoost
+    \item LightGBM
+    \item Random Forest
+\end{itemize}
+
+A Tabela \ref{tab:parametros} sintetiza os parâmetros constantes atribuídos ao problema. Esses valores foram obtidos a partir de um registro aleatório extraído do conjunto de treino, mantendo a coerência geológica e operacional conforme detalhado na Seção \ref{subsec:formulacao}.
+
+\begin{table}[]
+    \centering
+    \captionsetup{justification=centering}
+    \caption{Parâmetros do Problema}
+    \label{tab:parametros}
+    \small 
+    \setlength{\tabcolsep}{3pt} % Compressão horizontal
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{cc}
+        \toprule
+        Nome do Parâmetro & Valor \\
+        \midrule
+        Grau API & $26.8$ \\
+        Densidade GLP Gás & $2.007620$ \\
+        Densidade GLP Líquido & $528.9763$ \\
+        PCS & $42550.658$ \\
+        Idade & $1353$ \\
+        Lâmina D'Água & $941$ \\
+        Distância do Vizinho 1 & $1.2$ \\
+        Distância do Vizinho 2 & $2.47$ \\
+        Distância do Vizinho 3 & $2.64$ \\
+        Poços no Raio de 2 km & $1$ \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+A Tabela \ref{tab:restricoes} descreve os domínios e os limites operacionais impostos às variáveis de decisão. Para as vazões de água e gás, assim como para o tempo de produção, o limite inferior correspondeu ao valor mínimo histórico verificado na base de treino, enquanto o limite superior foi determinado como infinito a fim de não limitar a decisão do \textit{solver} às informações da distribuição histórica com o qual o modelo foi treinado. Em relação ao Preço de Referência, fixaram-se como limites inferior e superior o primeiro e o terceiro quartis da distribuição histórica, respectivamente.
+
+\begin{table}[]
+    \centering
+    \captionsetup{justification=centering}
+    \caption{Limites das Variáveis}
+    \label{tab:restricoes}
+    \small 
+    \setlength{\tabcolsep}{3pt} % Compressão horizontal
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{ccc}
+        \toprule
+        Variável & Limite Inferior & Limite Superior \\
+        \midrule
+        Vazão de Água & $0.0008$ & $\infty$\\
+        Vazão de Gás & $0.0002$ & $\infty$\\
+        Tempo de Produção & $1.0$ & $\infty$\\
+        Preço de referência & $1343.1815$ & $2239.3258$\\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+Por fim, a Tabela \ref{tab:resultado_gurobi} consolida as soluções ótimas encontradas pelo Gurobi ao utilizar cada um dos três modelos preditivos. Sob idênticas condições de restrições e parâmetros, a formulação que utilizou o modelo \textbf{LightGBM} alcançou o maior valor na função objetivo — maximização da vazão diária de petróleo —, atingindo 11.916,06 bbl/dia e superando as soluções obtidas via \textit{Random Forest} e XGBoost. Esse resultado evidencia a capacidade do modelo em determinar fronteiras de partição mais favoráveis à busca do solucionador exato, validando a sua escolha como o modelo final da pesquisa.
+
+\begin{table}[]
+    \centering
+    \captionsetup{justification=centering}
+    \caption{Soluções das Variáveis}
+    \label{tab:resultado_gurobi}
+    \small 
+    \setlength{\tabcolsep}{3pt} % Compressão horizontal
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{cccc}
+        \toprule
+        Variável & Random Forest & XGBoost & LightGBM \\
+        \midrule
+        Vazão de Água & $41.86$ & $45.67$ & $53.88$ \\
+        Vazão de Gás & $178.92$ & $226.9$ & $230.55$ \\
+        Tempo de Produção & $718$ & $717$ & $718.5$ \\
+        Preço de Referência & $2111.13$ & $2239.33$ & $2229.36$ \\
+        \midrule
+        Vazão de Petróleo & $11703.69$ & $11552.55$ & $11916.06$ \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+Todos os experimentos de otimização foram executados em um ambiente computacional com as seguintes especificações:
+
+\begin{itemize}
+    \item \textbf{Processador:} Intel® Core™ 7 150U × 12;
+    \item \textbf{Memória:} 32 GB de RAM;
+    \item \textbf{\textit{Solver} Matemático:} Gurobipy 13.0.2 e Gurobi-machinelearning 1.7.0;
+    \item \textbf{Sistema Operacional:} Ubuntu Linux 24.04;
+    \item \textbf{Linguagem de Programação:} Python 3.12.3.
+\end{itemize}

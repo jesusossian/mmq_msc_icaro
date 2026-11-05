@@ -1,0 +1,12 @@
+% Separe as palavras-chave por ponto
+
+\icaroC{Esta dissertação de mestrado} apresenta a aplicação de modelos de Aprendizagem de Máquina para a otimização de simuladores de poços de petróleo marítimo. Tais modelos utilizam-se de dados e, por meio de treinamentos específicos, tornam-se capazes de mimetizar o comportamento de simuladores físicos com precisão aceitável e baixo custo computacional.
+A metodologia abrange a extração de dados reais do sistema de Consulta de Dados Públicos (CDP) da Petrobras, referente ao período de janeiro de 2018 a dezembro de 2025. 
+O fluxo de trabalho incluiu um processo de escolha dos dados a serem expostos aos modelos, sendo selecionados especificamente dados de poços situados no Rio de Janeiro, na Bacia de Campos, a fim de se manter dados de poços fisicamente próximos, seguido então da limpeza de dados (\textit{Data Cleansing}), engenharia de atributos, segmentação dos dados, treinamento e avaliação dos modelos. 
+Foram realizados experimentos computacionais comparando 8 (oito) algoritmos de Aprendizagem de Máquina, que tinham como variável alvo a produção diária dos poços, submetidos à otimização de hiperparâmetros via \textit{GridSearchCV}.
+Os resultados demonstram que o modelo baseado em \textit{Gradient Boosting} obteve o melhor desempenho, alcançando um coeficiente de determinação ($R^2$) de 0,8235 e obtendo uma raiz de erro quadrático médio (RMSE) igual a 783,7745, o que representa $31.58\%$ da média de produção diária dos poços.
+Conclui-se que a abordagem não linear é essencial para capturar as complexas interações do reservatório, validando o uso de modelos \textit{surrogate} como ferramentas eficientes para o gerenciamento de produção \textit{offshore}.
+
+%\jesusC{E o que pretense fazer até a defesa?}
+
+\palavraschave{Aprendizagem de Máquina. Modelos Surrogate. Otimização. Poços de Petróleo.}

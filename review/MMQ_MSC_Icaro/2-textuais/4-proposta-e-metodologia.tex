@@ -1,0 +1,102 @@
+\chapter{Proposta e Metodologia}
+\label{cap:proposta-e-metodologia}
+
+Neste capítulo, apresentam-se a proposta central e os procedimentos metodológicos adotados para a execução dos experimentos computacionais deste trabalho. Ressalta-se que todos os procedimentos e rotinas de cálculo foram desenvolvidos utilizando a linguagem Python.
+
+A proposta deste trabalho consiste no desenvolvimento e na validação de um ecossistema de modelos de \gls{ML} capaz de emular o comportamento de simuladores físicos de poços de petróleo, permitindo a predição de vazões e a otimização de cenários operacionais. Para a viabilização desta proposta, definem-se as seguintes frentes de atuação:
+
+\begin{itemize}
+    \item Analisar o comportamento dos dados e a relação entre as variáveis físicas por meio de matrizes de correlação, identificando o grau de dependência entre elas e evitando possíveis enviesamentos no modelo.
+    \item Avaliar a natureza do problema (linear ou não linear) com base no desempenho das métricas obtidas, utilizando esses resultados para orientar a escolha das arquiteturas de \gls{ML} mais eficazes.
+    \item Treinar e comparar diferentes algoritmos de \gls{ML}, selecionando aquele que apresente a melhor precisão e capacidade de generalizar para novos cenários de produção.
+    \item Consolidar os resultados em um trabalho técnico que contribua para a literatura da área e sirva de base sólida para a dissertação de mestrado.
+\end{itemize}
+
+No que tange à metodologia, a etapa inicial consistiu na extração de dados de produção de poços de petróleo \textit{offshore} situados em diversas bacias brasileiras. Esses dados foram obtidos por meio do sistema de \href{https://cdp.anp.gov.br/ords/r/cdp_apex/consulta-dados-publicos-cdp/principal}{\gls{CDP} da Petrobras}, que organiza e disponibiliza os registros com periodicidade mensal. Para compor a base deste estudo, foram selecionados os arquivos referentes ao intervalo entre janeiro de 2018 e dezembro de 2025.
+
+Devido à padronização de colunas e formatos mantida pela plataforma, os arquivos mensais foram importados e consolidados em um único \textit{dataframe} utilizando a biblioteca Pandas da linguagem Python. A escolha desta biblioteca justifica-se pela sua eficiência na manipulação de grandes volumes de dados estruturados e pelo suporte a operações complexas de limpeza e tratamento, fundamentando-se nos conceitos discutidos na Seção \ref{sec:limpeza_dados}. Com as funcionalidades dessa biblioteca, foi utilizado um \textit{script} que foi responsável pela remoção de atributos considerados desnecessários para a modelagem, categorizados da seguinte forma:
+
+\begin{itemize}
+    \item \textbf{Dados Administrativos e Geográficos:} Variáveis como "Estado", "Bacia", "Operador", "Nome Poço Operador", "Número do Contrato" e informações sobre instalações ("Instalação Destino", "Tipo Instalação") foram removidas. Esses atributos funcionam apenas como identificadores ou metadados geográficos, não possuindo correlação física direta com as dinâmicas de produção que o modelo \textit{surrogate} visa emular.
+    \item \textbf{Metadados de Controle e Sistema:} Colunas como "Período da Carga", "Corrente" e "Data de atualização" foram descartadas por tratarem-se de registros temporais de auditoria interna da plataforma de \gls{CDP}, sendo irrelevantes para o comportamento produtivo dos poços.
+    \item \textbf{Composição Química de Alta Granularidade:} A análise detalhada da composição molar do gás (frações de metano, etano, propano até undecanos, além de gases inertes) e as frações de destilados foram excluídas. A manutenção desses atributos de alta granularidade aumentaria excessivamente a complexidade do modelo, podendo introduzir ruído e dificultar a generalização para diferentes cenários de reservatório.
+    \item \textbf{Variáveis Redundantes ou de Escopo Secundário:} Métricas de vazão secundárias, como "Condensado (bbl/dia)" e a distinção entre "Gás Natural Assoc/N Assoc", foram removidas para evitar a colinearidade com as variáveis alvo principais, simplificando a arquitetura do modelo sem perda de fidelidade na representação do sistema.
+\end{itemize}
+
+Após a seleção de atributos, foi realizada a adequação dos tipos de dados das colunas remanescentes no \textit{dataframe} do Pandas. Com exceção de três variáveis, uma contendo o nome do poço registrado pela Petrobras, uma com o nome do campo no qual o poço está instalado, e outra contendo o período em que os dados daquela linha foram registrados (mês e ano), as demais colunas foram convertidas para o formato numérico, garantindo a compatibilidade com os algoritmos de aprendizado de máquina. 
+
+Uma etapa crítica nesta fase foi a conversão do separador decimal. Visto que os dados brutos seguiam o padrão regional brasileiro (uso de vírgula), foi implementada uma rotina de tratamento para a substituição sistemática da vírgula pelo ponto. Essa normalização sintática é essencial para que o interpretador Python reconheça os registros como valores de ponto flutuante (\textit{float}), permitindo que o Pandas processe as colunas tanto como variáveis preditoras quanto como variáveis alvo.
+
+Concluída a correção dos tipos, realizou-se o tratamento de dados ausentes por meio da exclusão de todas as instâncias que continham valores nulos (\textit{NaN - Not a Number}). Esta ação visou mitigar o risco de erros durante a etapa de treinamento e assegurar a integridade estatística do conjunto de dados. Ressalta-se que a remoção das linhas nulas foi executada propositalmente após a conversão tipológica; no Pandas, objetos nulos em colunas numéricas são tratados como ponto flutuante, o que permitiu que o tratamento de valores faltantes fosse realizado de forma consistente com a estrutura final do \textit{dataframe}.
+
+Para complementar a preparação do \textit{dataframe} e enriquecer o conjunto de variáveis preditoras, realizou-se uma etapa de engenharia de atributos (\textit{feature engineering}). Esta fase envolveu a integração do \textit{dataset} principal com dois novos conjuntos de dados, um disponibilizado pelo \gls{CDP} contendo informações cadastrais dos poços, e outro disponibilizado pelo site do \href{https://www.gov.br/anp/pt-br/assuntos/royalties-e-outras-participacoes/preco-de-referencia-do-petroleo}{Gov}.
+
+No primeiro conjunto de dados foi possível realizar o cruzamento entre as bases, utilizando o nome do poço como chave de ligação, extraindo as datas de início de operação de cada unidade e sincronizando com as datas dos registros mensais de produção. Dessa forma, foi possível calcular o delta temporal de atividade de cada poço. Essa nova variável, denominada "Idade", armazena o número total de dias decorridos desde o início da operação até o momento do registro, fornecendo ao modelo uma métrica contínua do tempo de vida e do estágio de maturação do poço. Além disso, foi possível obter a informação da "lâmina d'água" de cada um dos poços, com essa nova variável representando a distância exata entre a superfície da água e o fundo do mar, sendo uma informação que pode vir a contribuir com a qualidade de predição dos modelos.
+
+Já no segundo conjunto de dados, foi possível obter dados acerca do preço de referência do petróleo em cada um dos meses analisados, sendo feita a segmentação dos preços com base no nome do Campo em que está sendo extraído o petróleo, e essa última informação também foi utilizada para realizar o cruzamento dos dados.
+
+Com isso, as colunas utilizadas para os cruzamentos — nome do poço, nome do campo e períodos temporais específicos — foram removidas do \textit{dataframe}, evitando assim a redundância e reduzindo a dimensionalidade dos dados para o treinamento dos algoritmos.
+
+Após a consolidação das variáveis de entrada, foram selecionados exclusivamente os registros de poços situados na Bacia de Campos, no estado do Rio de Janeiro. Essa filtragem espacial foi adotada para garantir que os modelos aprendam sobre um conjunto de poços com características físicas e operacionais próximas, evitando o treinamento com dados provenientes de contextos geológicos muito divergentes. Adicionalmente, a escolha dessa região justifica-se por representar o maior volume de observações disponíveis no \textit{dataframe}.
+
+Por fim, para obter o \textit{dataframe} final utilizado pelos modelos, realizou-se o tratamento de anomalias e redundâncias, fase crítica para assegurar a veracidade e a integridade dos dados antes do treinamento. Inicialmente, foram removidos todos os registros duplicados, garantindo que instâncias repetidas não gerassem um enviesamento indevido nos algoritmos. Na sequência, foram removidos registros com preenchimento inconsistente, considerando que registros com as variáveis de Vazão de Petróleo, Vazão de Água, Vazão de Gás e Lámina D'Água iguais a zero representam inconsistências. Para fazer a detecção dos \textit{outliers} foi utilizada a biblioteca \textit{IsolationForest} do Python, utilizando os valores númericos do \textit{dataframe} para treinar o modelo, para que esse possa fazer a detecção dos valores discrepantes.
+
+A exclusão, tanto de valores inconsistentes, quanto dos \textit{outliers} visou assegurar que o treinamento ocorresse sobre um conjunto de dados representativo do comportamento operacional típico, melhorando assim a precisão e a confiabilidade das predições. Com a conclusão deste fluxo, o conjunto de dados apresentou-se devidamente limpo e enriquecido para a execução dos experimentos computacionais.
+
+Após todos os procedimentos, o \textit{dataframe} final apresentou as seguintes variáveis:
+
+\begin{itemize}
+    \item \textbf{Vazão de Petróleo diária}: quantidade de Petróleo extraído por dia, medido em bbl.
+    \item \textbf{Vazão de Água diária}: quantidade de Água extraída por dia, medido em bbl.
+    \item \textbf{Vazão de Gás diária}: quantidade de Gás extraído por dia, medido em bbl.
+    \item \textbf{Tempo de Produção}: número de horas no mês em que houve produção.
+    \item \textbf{Grau API}: função especial da densidade relativa a 60°F/60°F, representada pela seguinte equação \cite{abnt7148}:
+    \begin{equation*}
+        \text{°API} = \frac{141,5}{\text{densidade relativa 60°F/60°F}} - 131,5
+    \end{equation*}
+    \item \textbf{Densidade \gls{GLP} Líquido}: razão entre a massa específica do \gls{GLP} a uma dada temperatura e a massa específica da água a uma dada temperatura \cite{abnt14065}.
+    \item \textbf{Densidade \gls{GLP} Gás}: relação entre a densidade absoluta do gás e a densidade absoluta do ar seco, na mesma pressão e temperatura \cite{abnt15358}.
+    \item \textbf{\gls{PCS}}: quantidade de energia liberada na forma de calor, na combustão completa de uma quantidade definida de gás com o ar, à pressão constante e com todos os produtos de combustão retornando à temperatura e pressão iniciais dos reagentes, onde toda a água formada pela reação encontra-se em forma líquida \cite{abnt15213}.
+    \item \textbf{Lâmina D'Água}: distância existente entre a superfície da água e o fundo do mar.
+    \item \textbf{Idade}: Quantidade de dias em que o poço esteve ativo de o início da sua produção.
+    \item \textbf{Preço de Referência}: preço de referência do Petróleo em um determinado mês.
+\end{itemize}
+
+Para a execução dos experimentos, o \textit{dataframe} foi segmentado em duas componentes fundamentais: o conjunto de atributos (\textit{features} ou \textit{inputs}) e a variável alvo (\textit{target} ou \textit{output}). Enquanto a variável alvo representa a grandeza que o modelo deve estimar, as \textit{features} constituem o vetor de variáveis independentes que fornecem os subsídios necessários para que o algoritmo identifique padrões de produção e realize as predições desejadas.
+
+A partir dessa segmentação, os registros datados até o dia 31 de dezembro de 2023 foram selecionados como conjunto de \textbf{treino}, enquanto os dados posteriores foram designados para o conjunto de \textbf{teste}. Essa divisão temporal foi adotada com a finalidade de avaliar a capacidade dos modelos de predizer cenários futuros com base no histórico produtivo anterior. Dessa forma, o conjunto de treino foi destinado ao ajuste dos parâmetros internos dos modelos, enquanto o conjunto de teste foi reservado estritamente para mensurar a capacidade de generalização e a fidelidade preditiva das arquiteturas avaliadas.
+
+Com os dados devidamente particionados, procedeu-se à padronização das \textit{features} por meio da classe \texttt{StandardScaler}, ajustando os atributos para média zero e variância unitária. Essa etapa foi integrada diretamente ao processo de validação cruzada via \texttt{Pipeline} exclusivamente para os algoritmos sensíveis à escala das variáveis: Regressão Linear, Ridge, Lasso, \gls{KNN} e \gls{SVR}. Dessa forma, o ajuste do escalonador (\textit{fit}) ocorreu estritamente sobre os subconjuntos internos de treino de cada \textit{fold}, sendo apenas replicado (\textit{transform}) nos conjuntos de validação e de teste. Essa abordagem mitiga o risco de \textit{data leakage} (vazamento de dados) tanto na busca em grade quanto na avaliação final, assegurando que estatísticas dos dados futuros não influenciem o treinamento e refletindo um cenário operacional fidedigno. Por sua vez, os modelos baseados em árvores de decisão (\textit{Random Forest}, \textit{Gradient Boosting} e \textit{LightGBM}) não precisaram desse ajuste, já que algoritmos baseados em árvores não são afetados pela escala das variáveis.
+
+Concluída a etapa de pré-processamento, deu-se início ao treinamento e à avaliação dos modelos de \gls{ML}. Os experimentos seguiram uma ordem planejada de avaliação: iniciou-se pelos modelos lineares para estabelecer uma \textit{baseline} de desempenho, partindo-se em seguida para modelos baseados em árvores, modelos baseados em instâncias e margens, e finalizando com implementações avançadas de \textit{boosting}.
+
+Inicialmente, foram avaliados o modelo de Regressão Linear simples e suas extensões com regularização: Ridge e Lasso, verificando se o comportamento da vazão apresentava uma natureza linear frente às variáveis operacionais. Na sequência, avaliaram-se os métodos baseados em árvores de decisão, empregando o Random Forest e o Gradient Boosting, visando capturar interações não lineares e mitigar ruídos operacionais. Em seguida, foram testados os algoritmos \gls{KNN} e \gls{SVR}, analisando o impacto do aprendizado baseado em vizinhança e margens de erro estruturais. Por fim, utilizou-se o LightGBM, explorando sua abordagem de particionamento acelerado e otimizado para o ajuste final das predições.
+
+Para cada modelo, exceto o de Regressão Linear, foi utilizada a classe \texttt{GridSearchCV}, que realiza uma busca sobre um espaço de parâmetros previamente especificado. Este método opera em conjunto com a técnica de \textit{k-fold cross-validation} (validação cruzada), dividindo o conjunto de treinamento em subpartes, que para o contexto desse trabalho foram utilizadas 3 subpartes, para garantir que a escolha dos melhores hiperparâmetros seja estatisticamente robusta e não dependente de uma única partição dos dados. 
+
+A aplicação desta técnica foi fundamental para ajustar parâmetros críticos, como o coeficiente de penalidade ($\alpha$) nos modelos Lasso e Ridge, a profundidade máxima das árvores no Random Forest e XGBoost, e a quantidade de estimadores do LightGBM. Inicialmente, o \texttt{GridSearchCV} foi configurado para selecionar a combinação que maximizasse o coeficiente de determinação ($R^2$) no conjunto de validação, porém, após alguns testes, a ferramenta foi configurada para minimizar o \gls{RMSE}, de modo a reduzir a magnitude dos erros. Essa mudança na estratégia do \texttt{GridSearch} foi feita sobre a justificativa de buscar melhorias de novas métricas, visto que o $R^2$ já estava atingindo valores satisfatórios. Tal abordagem assegura que a comparação final entre os modelos seja justa, uma vez que todos os algoritmos foram avaliados em suas configurações otimizadas.
+
+Com todas as métricas estatísticas extraídas dos modelos, bem como o tempo de execução de todas as suas combinações utilizadas no \texttt{GridSearchCV}, tais informações foram registradas a fim de comparar e tirar conclusões sobre os algoritmos, de modo a tomar as melhores decisões levando em consideração o problema abordado no seguinte trabalho. As conclusões serão apresentadas no Capítulo \ref{cap:experimentos}.
+
+A fim de complementar o estudo em questão, foi utilizada a ferramenta \textit{Gurobi Machine Learning}, uma ferramenta de código aberto, desenvolvida na linguagem Python que permite os usuários utilizarem de modelos de \gls{ML} treinados como restrições de um problema de \gls{PO}, de modo a modelar as relações das variáveis \cite{gurobiml}. Para o problema em questão, foi utilizada como função objetivo a maximização da Vazão diária de Petróleo, nas restrições, os valores de Vazão diária de Água, Vazão diária de Gás e o Tempo de Produção foram consideradas as variáveis de decisão do problema, enquanto os valores dos outros atributos foram fixados em um dos registros do \textit{dataframe}, de modo a exemplificar e avaliar a utilização da ferramenta.
+    
+Após a conclusão dos experimentos, todas as métricas estatísticas de desempenho, juntamente com o custo computacional — mensurado pelo tempo de execução das combinações exaustivas do \texttt{GridSearchCV} — foram consolidadas para análise. Esse conjunto de dados foi fundamental para fundamentar uma análise comparativa rigorosa entre os algoritmos, permitindo avaliar o equilíbrio entre precisão preditiva e eficiência computacional. Dessa forma, a seleção do modelo ideal foi pautada por critérios técnicos alinhados às necessidades de emulação de sistemas de produção de poços marítimos. As análises detalhadas e as discussões sobre o desempenho de cada arquitetura serão apresentadas no Capítulo \ref{cap:experimentos}.
+
+% \icaroC{Vou adicionar as descrições das variáveis aqui, mas não ficarão exatamente nesse local}
+
+% \begin{itemize}
+%     \item Vazão de Petróleo diária: quantidade de Petróleo extraído por dia, medido em bbl.
+%     \item Vazão de Água diária: quantidade de Água extraída por dia, medido em bbl.
+%     \item Vazão de Gás diária: quantidade de Gás extraído por dia, medido em bbl.
+%     \item Tempo de Produção: número de horas no mês em que houve produção.
+%     \item Grau API: função especial da densidade relativa a 60°F/60°F, representada pela seguinte equação \cite{abnt7148}:
+%     \begin{equation*}
+%         \text{°API} = \frac{141,5}{\text{densidade relativa 60°F/60°F}} - 131,5
+%     \end{equation*}
+%     \item Densidade \gls{GLP} Líquido: razão entre a massa específica do \gls{GLP} a uma dada temperatura e a massa específica da água a uma dada temperatura \cite{abnt14065}.
+%     \item Densidade \gls{GLP} Gás: relação entre a densidade absoluta do gás e a densidade absoluta do ar seco, na mesma pressão e temperatura \cite{abnt15358}.
+%     \item \gls{PCS}: quantidade de energia liberada na forma de calor, na combustão completa de uma quantidade definida de gás com o ar, à pressão constante e com todos os produtos de combustão retornando à temperatura e pressão iniciais dos reagentes, onde toda a água formada pela reação encontra-se em forma líquida \cite{abnt15213}.
+%     \item Lâmina D'Água: distância existente entre a superfície da água e o fundo do mar.
+%     \item Idade: Quantidade de dias em que o poço esteve ativo de o início da sua produção.
+%     \item Preço de Referência: preço de referência do Petróleo em um determinado mês.
+% \end{itemize}
